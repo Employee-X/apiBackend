@@ -41,3 +41,9 @@ Create a ``.env.dev`` file in the root directory and add the following variables
 DATABASE_URL=<mongodb_url>
 secret_key=<secret_key>
 ```
+
+## Contributing
+
+Make changes to dev branch and create a pull request to merge with main.
+
+Remember to do `pip freeze > requirements.txt` before pushing to dev.
