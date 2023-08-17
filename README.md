@@ -4,22 +4,24 @@ This is the backend for the Web API. It is built using FastApi and MongoDB.
 
 ## Installation
 
-Install python3 and pip3
+Install python3.8 and pip
 
 ```bash
-sudo apt install python3 python3-pip
+sudo add-apt-repository ppa:deadsnakes/ppa
+sudo apt update
+sudo apt install python3.8 python3-pip
 ```
 
 Install virtualenv
 
 ```bash
-sudo apt install python3-venv
+sudo apt install python3.8-venv
 ```
 
 Create a virtual environment and activate it.
 
 ```bash
-python3 -m venv venv
+python3.8 -m venv venv
 source venv/bin/activate
 ```
 
