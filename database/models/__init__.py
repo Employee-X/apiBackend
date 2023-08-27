@@ -1,3 +1,3 @@
-from .user import User
+from .models import Job_Seeker,College,Recruiter
 
-__all__ = [User]
+__all__ = [Job_Seeker,College,Recruiter]
