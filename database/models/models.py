@@ -33,18 +33,23 @@ class User(Document):
 
 class Job_Seeker(Document):
     userId: PydanticObjectId
+
+    email: EmailStr
+    phone_number: PhoneNumber
+
     fullname: Optional[str] = None
     college: Optional[str] = None
-    email: EmailStr
     gender: Optional[Gender] = None
-    phone_number: PhoneNumber
     date_of_birth: Optional[str] = None
     profession: List[Profession] = []
     about: Optional[str] = None
     description: Optional[str] = None
+
     cv_url: Optional[str] = None
     verification_doc_url: Optional[str] = None
     cv_verified_status: bool = False
+
+    jobs_applied: List[PydanticObjectId] = []
 
     class Config:
         json_schema_extra = {
@@ -62,6 +67,7 @@ class Job_Seeker(Document):
                 "cv_url": "https://aws.s3.com/abc123.pdf",
                 "verification_doc_url": "https://aws.s3.com/abc123.pdf",
                 "cv_verified_status": False,
+                "jobs_applied": ["1234567890"],
             }
         }
     
@@ -117,10 +123,39 @@ class Recruiter(Document):
                 "linkedin": "xyz",
             }
         }
-    
+
     class Settings:
         name = "recruiter"    
-     
 
+class Job(Document):
+    recruiterId: PydanticObjectId
+    title: Optional[str] = None
+    description: Optional[str] = None
+    location: Optional[str] = None
+    job_type: Optional[str] = None
+    salary: Optional[str] = None
+    experience: Optional[str] = None
+    skills: Optional[str] = None
+    perks: Optional[str] = None
+    status: Optional[str] = None
+    applicants: List[PydanticObjectId] = []
 
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "recruiterId": "1234567890",
+                "title": "Software Engineer",
+                "description": "Software Engineer",
+                "location": "Delhi",
+                "job_type": "Full Time",
+                "salary": "10 LPA",
+                "experience": "2 years",
+                "skills": "Python, Django, Flask",
+                "perks": "Health Insurance, Free Food",
+                "status": "active",
+                "applicants": ["1234567890"],
+            }
+        }
 
+    class Settings:
+        name = "jobs"

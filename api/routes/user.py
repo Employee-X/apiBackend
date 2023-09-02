@@ -27,9 +27,11 @@ async def user_login(user_credentials: api_models.User_SignIn = Body(...)):
             token = sign_jwt(str(user_exists.id))
             return api_models.User_SignIn_Response(
                 access_token = token,
-                roles = user_exists.roles
-            )        
-        
+                roles = user_exists.roles,
+                email_verified=user_exists.email_verified,
+                mobile_verified=user_exists.mobile_verified,
+            )
+
         raise HTTPException(status_code=403, detail = "Incorrect email or password")
     
     raise HTTPException(status_code=403, detail = "Incorrect email or password")

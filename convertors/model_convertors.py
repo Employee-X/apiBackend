@@ -1,5 +1,6 @@
 import api.models.models as apiModels
 import database.models.models as DbUserModels
+from beanie import PydanticObjectId
 
 def apiUserToDbUser(user: apiModels.User_SignUp) -> DbUserModels.User:
     return DbUserModels.User(
@@ -9,7 +10,7 @@ def apiUserToDbUser(user: apiModels.User_SignUp) -> DbUserModels.User:
         roles = user.roles,
     )
 
-def apiJobSeekerProfileToDbJobSeekerProfile(profile: apiModels.Job_Seeker_Profile, userId: str) -> DbUserModels.Job_Seeker:
+def apiJobSeekerProfileToDbJobSeekerProfile(profile: apiModels.Job_Seeker_Profile, userId: PydanticObjectId) -> DbUserModels.Job_Seeker:
     return DbUserModels.Job_Seeker(
         userId = userId,
         fullname= profile.fullname,
@@ -23,7 +24,7 @@ def apiJobSeekerProfileToDbJobSeekerProfile(profile: apiModels.Job_Seeker_Profil
         profession = profile.profession,
     )
 
-def apiRecruiterProfileToDbRecruiterProfile(profile: apiModels.Recruiter_Profile, userId: str) -> DbUserModels.Recruiter:
+def apiRecruiterProfileToDbRecruiterProfile(profile: apiModels.Recruiter_Profile, userId: PydanticObjectId) -> DbUserModels.Recruiter:
     return DbUserModels.Recruiter(
         userId= userId,
         your_name= profile.your_name,
@@ -34,7 +35,7 @@ def apiRecruiterProfileToDbRecruiterProfile(profile: apiModels.Recruiter_Profile
         linkedin= profile.linkedin,
     )
 
-def apiCollegeProfileToDbCollegeProfile(profile: apiModels.College_Profile, userId) -> DbUserModels.College:
+def apiCollegeProfileToDbCollegeProfile(profile: apiModels.College_Profile, userId: PydanticObjectId) -> DbUserModels.College:
     return DbUserModels.College(
         userId= userId,
         your_name= profile.your_name,
@@ -76,4 +77,33 @@ def dbRecruiterProfileToApiRecruiterProfile(profile: DbUserModels.Recruiter) -> 
         address= profile.address,
         phone_number= profile.phone_number,
         linkedin= profile.linkedin,
+    )
+
+def apiJobToDbJob(job: apiModels.Job, recruiterId: PydanticObjectId) -> DbUserModels.Job:
+    return DbUserModels.Job(
+        recruiterId = recruiterId,
+        title = job.title,
+        description = job.description,
+        location= job.location,
+        job_type= job.job_type,
+        salary= job.salary,
+        experience= job.experience,
+        skills= job.skills,
+        perks= job.perks,
+        status= job.status,
+    )
+
+def dbJobToApiJobWithId(job: DbUserModels.Job, company_name :str) -> apiModels.Job_with_id:
+    return apiModels.Job_with_id(
+        id=str(job.id),
+        title= job.title,
+        description= job.description,
+        location= job.location,
+        job_type= job.job_type,
+        salary= job.salary,
+        experience= job.experience,
+        skills= job.skills,
+        perks= job.perks,
+        status= job.status,
+        company_name= company_name,
     )

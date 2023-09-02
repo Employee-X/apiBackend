@@ -36,12 +36,16 @@ class User_SignIn(HTTPBasicCredentials):
 class User_SignIn_Response(BaseModel):
     access_token: str
     roles: Roles
+    email_verified: bool = False
+    mobile_verified: bool = False
 
     class Config:
         josn_schema_extra = {
             "example": {
                 "access_token": "fvbfhfjveu423634h4vc54g43v42ghc4234523456gveewr",
-                "roles": "job_seeker"
+                "roles": "job_seeker",
+                "email_verified": False,
+                "mobile_verified": False,
             }
         }
 
@@ -90,7 +94,7 @@ class College_Profile(BaseModel):
                 "email": "abc123@gmail.com",
                 "address": "IIT Delhi, Hauz Khas, New Delhi, 110016",
                 "phone_number": "+918888887777",
-                "no_of_students": "500",
+                "no_of_students": 500,
             }
         }
 
@@ -135,5 +139,90 @@ class Success_Message_Response(BaseModel):
         josn_schema_extra = {
             "example": {
                 "message": "Hello world!",
+            }
+        }
+
+class Job(BaseModel):
+    title: Optional[str] = None
+    company_name: Optional[str] = None
+    description: Optional[str] = None
+    location: Optional[str] = None
+    job_type: Optional[str] = None
+    salary: Optional[str] = None
+    experience: Optional[str] = None
+    skills: Optional[str] = None
+    perks: Optional[str] = None
+    status: Optional[str] = None
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "title": "Software Engineer",
+                "company_name": "employeeX",
+                "description": "Software Engineer",
+                "location": "Delhi",
+                "job_type": "Full Time",
+                "salary": "10 LPA",
+                "experience": "2 years",
+                "skills": "Python, Django, Flask",
+                "perks": "Health Insurance, Free Food",
+                "status": "active",
+            }
+        }
+
+class Job_with_id(Job):
+    id: str
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "id": "1234567890",
+                "title": "Software Engineer",
+                "company_name": "employeeX",
+                "description": "Software Engineer",
+                "location": "Delhi",
+                "job_type": "Full Time",
+                "salary": "10 LPA",
+                "experience": "2 years",
+                "skills": "Python, Django, Flask",
+                "perks": "Health Insurance, Free Food",
+                "status": "active",
+            }
+        }
+
+class Job_List(BaseModel):
+    jobs: List[Job_with_id]
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "jobs": [
+                    {
+                        "id": "1234567890",
+                        "title": "Software Engineer",
+                        "company_name": "employeeX",
+                        "description": "Software Engineer",
+                        "location": "Delhi",
+                        "job_type": "Full Time",
+                        "salary": "10 LPA",
+                        "experience": "2 years",
+                        "skills": "Python, Django, Flask",
+                        "perks": "Health Insurance, Free Food",
+                        "status": "active",
+                    },
+                    {
+                        "id": "1234567890",
+                        "title": "Software Engineer",
+                        "company_name": "employeeX",
+                        "description": "Software Engineer",
+                        "location": "Delhi",
+                        "job_type": "Full Time",
+                        "salary": "10 LPA",
+                        "experience": "2 years",
+                        "skills": "Python, Django, Flask",
+                        "perks": "Health Insurance, Free Food",
+                        "status": "active",
+                    },
+                ]
             }
         }
