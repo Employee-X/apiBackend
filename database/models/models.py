@@ -2,9 +2,9 @@ from beanie import Document
 from pydantic import EmailStr
 from pydantic_extra_types.phone_numbers import PhoneNumber
 from beanie import PydanticObjectId
-from typing import Optional
+from typing import Optional, List
 
-from utils.utils import Roles,Gender
+from utils.utils import Roles,Gender,Profession
 
 
 class User(Document):
@@ -39,7 +39,12 @@ class Job_Seeker(Document):
     gender: Optional[Gender] = None
     phone_number: PhoneNumber
     date_of_birth: Optional[str] = None
+    profession: List[Profession] = []
+    about: Optional[str] = None
+    description: Optional[str] = None
     cv_url: Optional[str] = None
+    verification_doc_url: Optional[str] = None
+    cv_verified_status: bool = False
 
     class Config:
         json_schema_extra = {
@@ -51,7 +56,12 @@ class Job_Seeker(Document):
                 "gender": "male",
                 "phone_number": "+918888887777",
                 "date_of_birth": "2002-05-05",
+                "profession": ["student"],
+                "about": "I am a student",
+                "description": "I am a student",
                 "cv_url": "https://aws.s3.com/abc123.pdf",
+                "verification_doc_url": "https://aws.s3.com/abc123.pdf",
+                "cv_verified_status": False,
             }
         }
     

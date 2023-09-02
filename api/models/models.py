@@ -2,8 +2,8 @@ from fastapi import File, UploadFile
 from fastapi.security import HTTPBasicCredentials
 from pydantic import BaseModel, EmailStr, Field
 from pydantic_extra_types.phone_numbers import PhoneNumber
-from typing import Optional
-from utils.utils import Roles,Gender
+from typing import Optional, List
+from utils.utils import Roles,Gender,Profession
 
 # User Auth Models
 class User_SignUp(BaseModel):
@@ -53,6 +53,9 @@ class Job_Seeker_Profile(BaseModel):
     gender: Optional[Gender] = Field(default=None)
     phone_number: PhoneNumber
     date_of_birth: Optional[str] = Field(default=None)
+    profession: List[Profession] = []
+    about: Optional[str] = Field(default=None)
+    description: Optional[str] = Field(default=None)
 
     class Config:
         json_schema_extra = {
@@ -63,6 +66,9 @@ class Job_Seeker_Profile(BaseModel):
                 "gender": "male",
                 "phone_number": "+918888887777",
                 "date_of_birth": "2002-05-05",
+                "profession": ["student"],
+                "about": "I am a student",
+                "description": "I am a student",
             }
         }
 
@@ -113,11 +119,12 @@ class Recruiter_Profile(BaseModel):
 
 class CV_Response(BaseModel):
     cv_url: str
-
+    verif_doc_url: str
     class Config:
         json_schema_extra = {
             "example": {
                 "cv_url": "https://aws.s3.com/abc123.pdf",
+                "verif_doc_url": "https://aws.s3.com/abc123.pdf",
             }
         }
 

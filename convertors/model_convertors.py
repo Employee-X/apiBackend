@@ -6,7 +6,7 @@ def apiUserToDbUser(user: apiModels.User_SignUp) -> DbUserModels.User:
         email = user.email,
         mobile= user.phone_number,
         password = user.password,
-        roles = user.roles
+        roles = user.roles,
     )
 
 def apiJobSeekerProfileToDbJobSeekerProfile(profile: apiModels.Job_Seeker_Profile, userId: str) -> DbUserModels.Job_Seeker:
@@ -17,7 +17,10 @@ def apiJobSeekerProfileToDbJobSeekerProfile(profile: apiModels.Job_Seeker_Profil
         email = profile.email,
         gender= profile.gender,
         phone_number = profile.phone_number,
-        date_of_birth = profile.date_of_birth
+        date_of_birth = profile.date_of_birth,
+        about = profile.about,
+        description = profile.description,
+        profession = profile.profession,
     )
 
 def apiRecruiterProfileToDbRecruiterProfile(profile: apiModels.Recruiter_Profile, userId: str) -> DbUserModels.Recruiter:
@@ -28,7 +31,7 @@ def apiRecruiterProfileToDbRecruiterProfile(profile: apiModels.Recruiter_Profile
         email= profile.email,
         address= profile.address,
         phone_number= profile.phone_number,
-        linkedin= profile.linkedin
+        linkedin= profile.linkedin,
     )
 
 def apiCollegeProfileToDbCollegeProfile(profile: apiModels.College_Profile, userId) -> DbUserModels.College:
@@ -59,7 +62,10 @@ def dbJobSeekerProfileToApiJobSeekerProfile(profile: DbUserModels.Job_Seeker) ->
         email= profile.email,
         gender=profile.gender,
         phone_number= profile.phone_number,
-        date_of_birth= profile.date_of_birth
+        date_of_birth= profile.date_of_birth,
+        about = profile.about,
+        profession = profile.profession,
+        description = profile.description,
     )
 
 def dbRecruiterProfileToApiRecruiterProfile(profile: DbUserModels.Recruiter) -> apiModels.Recruiter_Profile:
@@ -69,5 +75,5 @@ def dbRecruiterProfileToApiRecruiterProfile(profile: DbUserModels.Recruiter) -> 
         email= profile.email,
         address= profile.address,
         phone_number= profile.phone_number,
-        linkedin= profile.linkedin
+        linkedin= profile.linkedin,
     )

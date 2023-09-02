@@ -57,21 +57,31 @@ async def get_profile(decoded_token: (str,str) = Depends(token_listener)):
 
 # update CV
 @router.post("/updateCV", response_model=api_models.Success_Message_Response)
-async def updateCV(decoded_token: (str,str) = Depends(token_listener),fileobject: UploadFile = File(...)):
+async def updateCV(decoded_token: (str,str) = Depends(token_listener),cvobject: UploadFile = File(...),verifobject: UploadFile = File(...)):
     validated, msg = await validate_user(decoded_token[1], None, None)
     if not validated:
         raise HTTPException(status_code=403, detail=msg)
-    filename = fileobject.filename
+    filename = cvobject.filename
     new_filename = unique_filename_generator(filename)
-    data = fileobject.file._file
+    data = cvobject.file._file
     uploads3 = await s3_client.upload_fileobj(filename=new_filename, fileobject=data)
-    if uploads3:
+    filename2 = verifobject.filename
+    new_filename2 = unique_filename_generator(filename2)
+    data2 = verifobject.file._file
+    uploads32 = await s3_client.upload_fileobj(filename=new_filename2, fileobject=data2)
+    if uploads3 and uploads32:
         s3_url = f"https://{s3_client.bucket}.s3.{s3_client.region}.amazonaws.com/{s3_client.key}{new_filename}"
-        _, past_cv = await jobSeeker_db.update_cv(s3_url,decoded_token[1])
+        s3_url2 = f"https://{s3_client.bucket}.s3.{s3_client.region}.amazonaws.com/{s3_client.key}{new_filename2}"
+        _, past_cv, past_verif_doc = await jobSeeker_db.update_cv(s3_url,s3_url2,decoded_token[1])
         if past_cv:
             status = await s3_client.delete_fileobj(past_cv.split('/')[-1])
             if not status:
-                print("Failed to delete file")
+                print("Failed to delete old cv")
+        if past_verif_doc:
+            status = await s3_client.delete_fileobj(past_verif_doc.split('/')[-1])
+            if not status:
+                print("Failed to delete old verif doc")
+
         return api_models.Success_Message_Response(
             message = "CV uploaded successfully"
         )
@@ -84,9 +94,12 @@ async def getCV(decoded_token: (str,str) = Depends(token_listener)):
     validated, msg = await validate_user(decoded_token[1], None, None)
     if not validated:
         raise HTTPException(status_code=403, detail=msg)
-    cv_url = await jobSeeker_db.get_cv(decoded_token[1])
+    cv_url, verif_url = await jobSeeker_db.get_cv(decoded_token[1])
     if not cv_url:
         raise HTTPException(status_code=404, detail="CV not found")
+    if not verif_url:
+        raise HTTPException(status_code=404, detail="Verification document not found")
     return api_models.CV_Response(
-        cv_url = cv_url
+        cv_url = cv_url,
+        verif_doc_url = verif_url,
     )
