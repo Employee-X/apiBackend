@@ -1,65 +1,73 @@
 import api.models.models as apiModels
 import database.models.models as DbUserModels
 
-def dbJobSeekerDataToApiJobSeekerData(user: DbUserModels.Job_Seeker):
-    return apiModels.Job_Seeker_Data(
-        fullname = user.fullname,
-        college = user.college,
+def apiUserToDbUser(user: apiModels.User_SignUp) -> DbUserModels.User:
+    return DbUserModels.User(
         email = user.email,
-        gender = user.gender,
-        phone_number = user.phone_number,
-        date_of_birth = user.date_of_birth
+        mobile= user.phone_number,
+        password = user.password,
+        roles = user.roles
     )
 
-def apiJobSeekerToDbJobSeeker(user: apiModels.Job_Seeker):
+def apiJobSeekerProfileToDbJobSeekerProfile(profile: apiModels.Job_Seeker_Profile, userId: str) -> DbUserModels.Job_Seeker:
     return DbUserModels.Job_Seeker(
-        fullname = user.fullname,
-        college = user.college,
-        email = user.email,
-        gender = user.gender,
-        phone_number = user.phone_number,
-        date_of_birth = user.date_of_birth,
-        password = user.password
+        userId = userId,
+        fullname= profile.fullname,
+        college = profile.college,
+        email = profile.email,
+        gender= profile.gender,
+        phone_number = profile.phone_number,
+        date_of_birth = profile.date_of_birth
     )
 
-def dbCollegeDataToApiCollegeData(user: DbUserModels.College):
-    return apiModels.College_Data(
-        your_name = user.your_name,
-        college_name =  user.college_name,
-        email = user.email,
-        address = user.address,
-        phone_number = user.phone_number,
-        no_of_students = user.no_of_students
-    )
-
-def apiCollegeToDbCollege(user: apiModels.College):
-    return DbUserModels.College(
-        your_name = user.your_name,
-        college_name =  user.college_name,
-        email = user.email,
-        address = user.address,
-        phone_number = user.phone_number,
-        no_of_students = user.no_of_students,
-        password = user.password
-    )
-
-def dbRecruiterDataToApiRecruiterData(user: DbUserModels.Recruiter):
-    return apiModels.Recruiter_Data(
-        your_name = user.your_name,
-        company_name =  user.company_name,
-        email = user.email,
-        address = user.address,
-        phone_number = user.phone_number,
-        linkedin = user.linkedin
-    )
-
-def apiRecruiterToDbRecruiter(user: apiModels.Recruiter):
+def apiRecruiterProfileToDbRecruiterProfile(profile: apiModels.Recruiter_Profile, userId: str) -> DbUserModels.Recruiter:
     return DbUserModels.Recruiter(
-        your_name = user.your_name,
-        company_name =  user.company_name,
-        email = user.email,
-        address = user.address,
-        phone_number = user.phone_number,
-        linkedin = user.linkedin,
-        password = user.password
+        userId= userId,
+        your_name= profile.your_name,
+        company_name= profile.company_name,
+        email= profile.email,
+        address= profile.address,
+        phone_number= profile.phone_number,
+        linkedin= profile.linkedin
+    )
+
+def apiCollegeProfileToDbCollegeProfile(profile: apiModels.College_Profile, userId) -> DbUserModels.College:
+    return DbUserModels.College(
+        userId= userId,
+        your_name= profile.your_name,
+        college_name= profile.college_name,
+        email= profile.email,
+        address= profile.address,
+        phone_number= profile.phone_number,
+        no_of_students= profile.no_of_students,
+    )
+
+def dbCollegeProfileToApiCollegeProfile(profile: DbUserModels.College) -> apiModels.College_Profile:
+    return apiModels.College_Profile(
+        your_name= profile.your_name,
+        college_name= profile.college_name,
+        email= profile.email,
+        address= profile.address,
+        phone_number= profile.phone_number,
+        no_of_students= profile.no_of_students,
+    )
+
+def dbJobSeekerProfileToApiJobSeekerProfile(profile: DbUserModels.Job_Seeker) -> apiModels.Job_Seeker_Profile:
+    return apiModels.Job_Seeker_Profile(
+        fullname= profile.fullname,
+        college= profile.college,
+        email= profile.email,
+        gender=profile.gender,
+        phone_number= profile.phone_number,
+        date_of_birth= profile.date_of_birth
+    )
+
+def dbRecruiterProfileToApiRecruiterProfile(profile: DbUserModels.Recruiter) -> apiModels.Recruiter_Profile:
+    return apiModels.Recruiter_Profile(
+        your_name= profile.your_name,
+        company_name= profile.company_name,
+        email= profile.email,
+        address= profile.address,
+        phone_number= profile.phone_number,
+        linkedin= profile.linkedin
     )
