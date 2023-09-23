@@ -6,6 +6,7 @@ from beanie import PydanticObjectId
 from auth.jwt_handler import sign_jwt
 
 import database.functions.user as user_db
+import database.functions.jobSeeker as jobSeeker_db
 import database.functions.recruiter as recruiter_db
 import database.functions.job as job_db
 import convertors.model_convertors as convertors
@@ -61,7 +62,10 @@ async def add_job(decoded_token: (str,str) = Depends(token_listener),job: api_mo
     validated, msg = await validate_user(decoded_token[1], None, None)
     if not validated:
         raise HTTPException(status_code=403, detail=msg)
-
+    recruiter = await recruiter_db.get_recruiter_profile_by_userId(decoded_token[1])
+    company_name = recruiter.company_name
+    if job.company_name != company_name:
+        raise HTTPException(status_code=403, detail="Company name does not match")
     dbJob = convertors.apiJobToDbJob(job, PydanticObjectId(decoded_token[1]))
     _ = await job_db.add_job(dbJob)
 
@@ -76,11 +80,9 @@ async def get_my_jobs(decoded_token: (str,str) = Depends(token_listener)):
         raise HTTPException(status_code=403, detail=msg)
 
     jobs = await job_db.get_jobs_by_recruiter_id(decoded_token[1])
-    recruiter = await recruiter_db.get_recruiter_profile_by_userId(decoded_token[1])
-    company_name = recruiter.company_name
     apiJobs = []
     for job in jobs:
-        apiJobs.append(convertors.dbJobToApiJobWithId(job, company_name))
+        apiJobs.append(convertors.dbJobToApiJobWithId(job))
     return api_models.Job_List(
         jobs = apiJobs
     )
@@ -91,7 +93,10 @@ async def update_job(jobId,decoded_token: (str,str) = Depends(token_listener),jo
     validated, msg = await validate_user(decoded_token[1], None, None)
     if not validated:
         raise HTTPException(status_code=403, detail=msg)
-
+    recruiter = await recruiter_db.get_recruiter_profile_by_userId(decoded_token[1])
+    company_name = recruiter.company_name
+    if job.company_name != company_name:
+        raise HTTPException(status_code=403, detail="Company name does not match")
     dbJob = convertors.apiJobToDbJob(job, PydanticObjectId(decoded_token[1]))
     print(dbJob)
     _ = await job_db.update_job(dbJob,jobId)
@@ -112,3 +117,35 @@ async def delete_job(jobId,decoded_token: (str,str) = Depends(token_listener)):
     return api_models.Success_Message_Response(
         message = "Job deleted successfully"
     )
+
+# get job applicants
+@router.get("/getJobApplicants/{jobId}", response_model=api_models.Seeker_List)
+async def get_job_applicants(jobId,decoded_token: (str,str) = Depends(token_listener)):
+    validated, msg = await validate_user(decoded_token[1], None, None)
+    if not validated:
+        raise HTTPException(status_code=403, detail=msg)
+
+    job = await job_db.get_job_by_id(jobId)
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    applicants = job.applicants
+    apiApplicants = []
+    for applicant_id in applicants:
+        applicant = await jobSeeker_db.get_job_seeker_profile_by_userId(str(applicant_id))
+        apiApplicants.append(convertors.dbJobSeekerProfileToApiJobSeekerProfileWithIdCv(applicant))
+    return api_models.Seeker_List(
+        applicants=apiApplicants
+    )
+
+# get user profile
+@router.get("/getUserProfile/{userId}", response_model=api_models.Job_Seeker_Profile_With_Id_CV)
+async def get_user_profile(userId,decoded_token: (str,str) = Depends(token_listener)):
+    validated, msg = await validate_user(decoded_token[1], None, None)
+    if not validated:
+        raise HTTPException(status_code=403, detail=msg)
+
+    profile = await jobSeeker_db.get_job_seeker_profile_by_userId(userId)
+    if not profile:
+        raise HTTPException(status_code=404, detail="Profile not found")
+    apiProfile = convertors.dbJobSeekerProfileToApiJobSeekerProfileWithIdCv(profile)
+    return apiProfile

@@ -46,6 +46,11 @@ async def user_signup(user: api_models.User_SignUp = Body(...)):
         raise HTTPException(
             status_code=409, detail = "User with email supplied already exists"
         )
+    user_exists = await user_db.get_user_by_mobile(user.phone_number)
+    if user_exists:
+        raise HTTPException(
+            status_code=409, detail = "User with mobile supplied already exists"
+        )
     
     user.password = hash_helper.encrypt(user.password)
 

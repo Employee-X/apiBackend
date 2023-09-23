@@ -62,4 +62,33 @@ class S3_SERVICE(object):
                 return True
         return False
 
+    async def send_otp_email(self,otp,email):
+        session = get_session()
+        async with session.create_client('ses', region_name=self.region,
+                                         aws_secret_access_key=self.aws_secret_access_key,
+                                         aws_access_key_id=self.aws_access_key_id) as client:
+            response = await client.send_email(
+                Destination={
+                    'ToAddresses': [
+                        email,
+                    ],
+                },
+                Message={
+                    'Body': {
+                        'Text': {
+                            'Charset': 'UTF-8',
+                            'Data': f'Your OTP for verification on EmployeeX website is {otp}. Do not share this otp and it is valid for 3 minutes only.',
+                        },
+                    },
+                    'Subject': {
+                        'Charset': 'UTF-8',
+                        'Data': 'EmployeeX: OTP for Verification',
+                    },
+                },
+                Source='EmployeeX <noreply@employeex.co.in>',
+            )
+            if response["ResponseMetadata"]["HTTPStatusCode"] == 200:
+                return True
+        return False
+
 s3_client = S3_SERVICE()

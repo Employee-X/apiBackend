@@ -1,3 +1,4 @@
+import datetime
 from typing import Union
 from beanie import PydanticObjectId
 
@@ -29,3 +30,28 @@ async def get_user_by_email(email: str) -> Union[dict, None]:
     if user:
         return user
     return None
+
+async def get_user_by_mobile(mobile: str) -> Union[dict, None]:
+    user = await user_collection.find_one({"mobile": mobile})
+    if user:
+        return user
+    return None
+
+async def update_otp(user_id: str, otp: int) -> Union[DbUserModels.User, None]:
+    expiration_time = datetime.datetime.now() + datetime.timedelta(minutes=3)
+    time_in_str = expiration_time.isoformat()
+    update_query = {"$set": {
+        "otp": otp,
+        "otp_expiration": time_in_str,
+    }}
+    user_to_update = await get_user_by_id(user_id)
+    updated_user = await user_to_update.update(update_query)
+    return updated_user
+
+async def update_email_verified(user_id: str) -> Union[DbUserModels.User, None]:
+    update_query = {"$set": {
+        "email_verified": True,
+    }}
+    user_to_update = await get_user_by_id(user_id)
+    updated_user = await user_to_update.update(update_query)
+    return updated_user

@@ -4,7 +4,7 @@ from pydantic_extra_types.phone_numbers import PhoneNumber
 from beanie import PydanticObjectId
 from typing import Optional, List
 
-from utils.utils import Roles,Gender,Profession
+from utils.utils import Roles,Gender,Profession,Skills
 
 
 class User(Document):
@@ -13,7 +13,9 @@ class User(Document):
     password: str
     roles: Roles
     email_verified: bool = False
-    mobile_verified: bool = False
+    mobile_verified: bool = True
+    otp: Optional[int] = 000000
+    otp_expiration: Optional[str] = "2023-04-01T05:00:30.001000"
 
     class Config:
         json_schema_extra = {
@@ -24,6 +26,8 @@ class User(Document):
                 "roles": "job_seeker",
                 "email_verified": False,
                 "mobile_verified": False,
+                "otp": 000000,
+                "expiration": "2021-05-05 12:00:00",
             }
         }
 
@@ -44,6 +48,7 @@ class Job_Seeker(Document):
     profession: List[Profession] = []
     about: Optional[str] = None
     description: Optional[str] = None
+    skills: List[Skills] = []
 
     cv_url: Optional[str] = None
     verification_doc_url: Optional[str] = None
@@ -64,6 +69,7 @@ class Job_Seeker(Document):
                 "profession": ["student"],
                 "about": "I am a student",
                 "description": "I am a student",
+                "skills": ["Python", "Django", "Flask"],
                 "cv_url": "https://aws.s3.com/abc123.pdf",
                 "verification_doc_url": "https://aws.s3.com/abc123.pdf",
                 "cv_verified_status": False,
@@ -129,13 +135,14 @@ class Recruiter(Document):
 
 class Job(Document):
     recruiterId: PydanticObjectId
+    company_name: Optional[str] = None
     title: Optional[str] = None
     description: Optional[str] = None
     location: Optional[str] = None
     job_type: Optional[str] = None
     salary: Optional[str] = None
     experience: Optional[str] = None
-    skills: Optional[str] = None
+    skills: List[Skills] = []
     perks: Optional[str] = None
     status: Optional[str] = None
     applicants: List[PydanticObjectId] = []
@@ -144,13 +151,14 @@ class Job(Document):
         json_schema_extra = {
             "example": {
                 "recruiterId": "1234567890",
+                "company_name": "employeeX",
                 "title": "Software Engineer",
                 "description": "Software Engineer",
                 "location": "Delhi",
                 "job_type": "Full Time",
                 "salary": "10 LPA",
                 "experience": "2 years",
-                "skills": "Python, Django, Flask",
+                "skills": ["Python", "Java", "JavaScript"],
                 "perks": "Health Insurance, Free Food",
                 "status": "active",
                 "applicants": ["1234567890"],

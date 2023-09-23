@@ -3,7 +3,7 @@ from fastapi.security import HTTPBasicCredentials
 from pydantic import BaseModel, EmailStr, Field
 from pydantic_extra_types.phone_numbers import PhoneNumber
 from typing import Optional, List
-from utils.utils import Roles,Gender,Profession
+from utils.utils import Roles,Gender,Profession, Skills
 
 # User Auth Models
 class User_SignUp(BaseModel):
@@ -30,6 +30,26 @@ class User_SignIn(HTTPBasicCredentials):
             "example": {
                 "username": "abc123@gmail.com",
                 "password": "3xt3m#",
+            }
+        }
+
+class SendOtp(BaseModel):
+    email: EmailStr
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "email": "abc123@gmail.com",
+            }
+        }
+
+class RecvOtp(BaseModel):
+    otp: int
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "otp": 123456,
             }
         }
 
@@ -60,6 +80,7 @@ class Job_Seeker_Profile(BaseModel):
     profession: List[Profession] = []
     about: Optional[str] = Field(default=None)
     description: Optional[str] = Field(default=None)
+    skills: List[Skills] = []
 
     class Config:
         json_schema_extra = {
@@ -73,6 +94,76 @@ class Job_Seeker_Profile(BaseModel):
                 "profession": ["student"],
                 "about": "I am a student",
                 "description": "I am a student",
+                "skills": ["Python", "Java", "JavaScript"],
+            }
+        }
+
+class Job_Seeker_Profile_With_Id_CV(Job_Seeker_Profile):
+    id: str
+    cv_url: Optional[str] = Field(default=None)
+    verification_doc_url: Optional[str] = Field(default=None)
+    cv_verified_status: bool = False
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "id": "1234567890",
+                "fullname": "Loren Ipsum  Dolor",
+                "college": "University of Virginia",
+                "email": "abc123@gmail.com",
+                "gender": "male",
+                "phone_number": "+918888887777",
+                "date_of_birth": "2002-05-05",
+                "profession": ["student"],
+                "about": "I am a student",
+                "description": "I am a student",
+                "skills": ["Python", "Java", "JavaScript"],
+                "cv_url": "https://aws.s3.com/abc123.pdf",
+                "verification_doc_url": "https://aws.s3.com/abc123.pdf",
+                "cv_verified_status": False,
+            }
+        }
+
+class Seeker_List(BaseModel):
+    applicants: List[Job_Seeker_Profile_With_Id_CV] = []
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "applicants": [
+                    {
+                        "id": "1234567890",
+                        "fullname": "Loren Ipsum  Dolor",
+                        "college": "University of Virginia",
+                        "email": "abc123@gmail.com",
+                        "gender": "male",
+                        "phone_number": "+918888887777",
+                        "date_of_birth": "2002-05-05",
+                        "profession": ["student"],
+                        "about": "I am a student",
+                        "description": "I am a student",
+                        "skills": ["Python", "Java", "JavaScript"],
+                        "cv_url": "https://aws.s3.com/abc123.pdf",
+                        "verification_doc_url": "https://aws.s3.com/abc123.pdf",
+                        "cv_verified_status": False,
+                    },
+                    {
+                        "id": "1234567890",
+                        "fullname": "Loren Ipsum  Dolor",
+                        "college": "University of Virginia",
+                        "email": "abc123@gmail.com",
+                        "gender": "male",
+                        "phone_number": "+918888887777",
+                        "date_of_birth": "2002-05-05",
+                        "profession": ["student"],
+                        "about": "I am a student",
+                        "description": "I am a student",
+                        "skills": ["Python", "Java", "JavaScript"],
+                        "cv_url": "https://aws.s3.com/abc123.pdf",
+                        "verification_doc_url": "https://aws.s3.com/abc123.pdf",
+                        "cv_verified_status": False,
+                    },
+                ]
             }
         }
 
@@ -124,11 +215,13 @@ class Recruiter_Profile(BaseModel):
 class CV_Response(BaseModel):
     cv_url: str
     verif_doc_url: str
+    cv_verif_status: bool = False
     class Config:
         json_schema_extra = {
             "example": {
                 "cv_url": "https://aws.s3.com/abc123.pdf",
                 "verif_doc_url": "https://aws.s3.com/abc123.pdf",
+                "cv_verif_status": False,
             }
         }
 
@@ -150,7 +243,7 @@ class Job(BaseModel):
     job_type: Optional[str] = None
     salary: Optional[str] = None
     experience: Optional[str] = None
-    skills: Optional[str] = None
+    skills: List[Skills] = []
     perks: Optional[str] = None
     status: Optional[str] = None
 
@@ -164,7 +257,7 @@ class Job(BaseModel):
                 "job_type": "Full Time",
                 "salary": "10 LPA",
                 "experience": "2 years",
-                "skills": "Python, Django, Flask",
+                "skills": ["Python", "Java", "JavaScript"],
                 "perks": "Health Insurance, Free Food",
                 "status": "active",
             }
@@ -184,9 +277,30 @@ class Job_with_id(Job):
                 "job_type": "Full Time",
                 "salary": "10 LPA",
                 "experience": "2 years",
-                "skills": "Python, Django, Flask",
+                "skills": ["Python", "Java", "JavaScript"],
                 "perks": "Health Insurance, Free Food",
                 "status": "active",
+            }
+        }
+
+class Job_with_status(Job_with_id):
+    application_status: bool = False
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "id": "1234567890",
+                "title": "Software Engineer",
+                "company_name": "employeeX",
+                "description": "Software Engineer",
+                "location": "Delhi",
+                "job_type": "Full Time",
+                "salary": "10 LPA",
+                "experience": "2 years",
+                "skills": ["Python", "Java", "JavaScript"],
+                "perks": "Health Insurance, Free Food",
+                "status": "active",
+                "application_status": False,
             }
         }
 
@@ -206,7 +320,7 @@ class Job_List(BaseModel):
                         "job_type": "Full Time",
                         "salary": "10 LPA",
                         "experience": "2 years",
-                        "skills": "Python, Django, Flask",
+                        "skills": ["Python", "Java", "JavaScript"],
                         "perks": "Health Insurance, Free Food",
                         "status": "active",
                     },
@@ -219,9 +333,48 @@ class Job_List(BaseModel):
                         "job_type": "Full Time",
                         "salary": "10 LPA",
                         "experience": "2 years",
-                        "skills": "Python, Django, Flask",
+                        "skills": ["Python", "Java", "JavaScript"],
                         "perks": "Health Insurance, Free Food",
                         "status": "active",
+                    },
+                ]
+            }
+        }
+
+class Seeker_Job_List(BaseModel):
+    jobs: List[Job_with_status]
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "jobs": [
+                    {
+                        "id": "1234567890",
+                        "title": "Software Engineer",
+                        "company_name": "employeeX",
+                        "description": "Software Engineer",
+                        "location": "Delhi",
+                        "job_type": "Full Time",
+                        "salary": "10 LPA",
+                        "experience": "2 years",
+                        "skills": ["Python", "Java", "JavaScript"],
+                        "perks": "Health Insurance, Free Food",
+                        "status": "active",
+                        "application_status": False,
+                    },
+                    {
+                        "id": "1234567890",
+                        "title": "Software Engineer",
+                        "company_name": "employeeX",
+                        "description": "Software Engineer",
+                        "location": "Delhi",
+                        "job_type": "Full Time",
+                        "salary": "10 LPA",
+                        "experience": "2 years",
+                        "skills": ["Python", "Java", "JavaScript"],
+                        "perks": "Health Insurance, Free Food",
+                        "status": "active",
+                        "application_status": False,
                     },
                 ]
             }
