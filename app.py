@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from config.config import initiate_database
 
@@ -8,6 +9,20 @@ from api.routes.college import router as CLLGRouter
 from api.routes.recruiter import router as RECRouter
 
 app = FastAPI()
+
+origins = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://www.employeex.co.in",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.on_event("startup")
 async def start_database():
