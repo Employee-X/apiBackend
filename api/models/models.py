@@ -81,6 +81,7 @@ class Job_Seeker_Profile(BaseModel):
     about: Optional[str] = Field(default=None)
     description: Optional[str] = Field(default=None)
     skills: List[Skills] = []
+    img_url: Optional[str] = None
 
     class Config:
         json_schema_extra = {
@@ -95,6 +96,7 @@ class Job_Seeker_Profile(BaseModel):
                 "about": "I am a student",
                 "description": "I am a student",
                 "skills": ["Python", "Java", "JavaScript"],
+                "img_url": "https://aws.s3.com/abc123.pdf"
             }
         }
 
@@ -103,6 +105,7 @@ class Job_Seeker_Profile_With_Id_CV(Job_Seeker_Profile):
     cv_url: Optional[str] = Field(default=None)
     verification_doc_url: Optional[str] = Field(default=None)
     cv_verified_status: bool = False
+    img_url: Optional[str] = None
 
     class Config:
         json_schema_extra = {
@@ -121,6 +124,7 @@ class Job_Seeker_Profile_With_Id_CV(Job_Seeker_Profile):
                 "cv_url": "https://aws.s3.com/abc123.pdf",
                 "verification_doc_url": "https://aws.s3.com/abc123.pdf",
                 "cv_verified_status": False,
+                "img_url": "https://aws.s3.com/abc123.pdf",
             }
         }
 
@@ -146,6 +150,7 @@ class Seeker_List(BaseModel):
                         "cv_url": "https://aws.s3.com/abc123.pdf",
                         "verification_doc_url": "https://aws.s3.com/abc123.pdf",
                         "cv_verified_status": False,
+                        "img_url": "https://aws.s3.com/abc123.pdf",
                     },
                     {
                         "id": "1234567890",
@@ -162,6 +167,7 @@ class Seeker_List(BaseModel):
                         "cv_url": "https://aws.s3.com/abc123.pdf",
                         "verification_doc_url": "https://aws.s3.com/abc123.pdf",
                         "cv_verified_status": False,
+                        "img_url": "https://aws.s3.com/abc123.pdf",
                     },
                 ]
             }
@@ -199,6 +205,7 @@ class Recruiter_Profile(BaseModel):
     address: Optional[str] = Field(default=None)
     phone_number: PhoneNumber
     linkedin: Optional[str] = Field(default=None)
+    description: Optional[str] = Field(default=None)
 
     class Config:
         json_schema_extra = {
@@ -209,6 +216,7 @@ class Recruiter_Profile(BaseModel):
                 "address": "IIT Delhi, Hauz Khas, New Delhi, 110016",
                 "phone_number": "+918888887777",
                 "linkedin": "xyz",
+                "description": "I am a recruiter."
             }
         }
 
@@ -225,6 +233,18 @@ class CV_Response(BaseModel):
             }
         }
 
+class IMG_Response(BaseModel):
+    img_url: str
+    bgimg_url: str
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "img_url": "https://aws.s3.com/abc123.pdf",
+                "bgimg_url": "https://aws.s3.com/abc123.pdf"
+            }
+        }
+
+
 class Success_Message_Response(BaseModel):
     message: str
 
@@ -238,6 +258,7 @@ class Success_Message_Response(BaseModel):
 class Job(BaseModel):
     title: Optional[str] = None
     company_name: Optional[str] = None
+    logo: Optional[str] = None
     description: Optional[str] = None
     location: Optional[str] = None
     job_type: Optional[str] = None
@@ -252,6 +273,7 @@ class Job(BaseModel):
             "example": {
                 "title": "Software Engineer",
                 "company_name": "employeeX",
+                "logo":"https://aws.s3.com/abc123.pdf",
                 "description": "Software Engineer",
                 "location": "Delhi",
                 "job_type": "Full Time",
@@ -272,6 +294,7 @@ class Job_with_id(Job):
                 "id": "1234567890",
                 "title": "Software Engineer",
                 "company_name": "employeeX",
+                "logo": "https://aws.s3.com/abc123.pdf",
                 "description": "Software Engineer",
                 "location": "Delhi",
                 "job_type": "Full Time",
@@ -292,6 +315,7 @@ class Job_with_status(Job_with_id):
                 "id": "1234567890",
                 "title": "Software Engineer",
                 "company_name": "employeeX",
+                "logo": "https://aws.s3.com/abc123.pdf",
                 "description": "Software Engineer",
                 "location": "Delhi",
                 "job_type": "Full Time",
@@ -315,6 +339,7 @@ class Job_List(BaseModel):
                         "id": "1234567890",
                         "title": "Software Engineer",
                         "company_name": "employeeX",
+                        "logo": "https://aws.s3.com/abc123.pdf",
                         "description": "Software Engineer",
                         "location": "Delhi",
                         "job_type": "Full Time",
@@ -328,6 +353,7 @@ class Job_List(BaseModel):
                         "id": "1234567890",
                         "title": "Software Engineer",
                         "company_name": "employeeX",
+                        "logo": "https://aws.s3.com/abc123.pdf",
                         "description": "Software Engineer",
                         "location": "Delhi",
                         "job_type": "Full Time",
@@ -352,6 +378,7 @@ class Seeker_Job_List(BaseModel):
                         "id": "1234567890",
                         "title": "Software Engineer",
                         "company_name": "employeeX",
+                        "logo": "https://aws.s3.com/abc123.pdf",
                         "description": "Software Engineer",
                         "location": "Delhi",
                         "job_type": "Full Time",
@@ -366,6 +393,7 @@ class Seeker_Job_List(BaseModel):
                         "id": "1234567890",
                         "title": "Software Engineer",
                         "company_name": "employeeX",
+                        "logo": "https://aws.s3.com/abc123.pdf",
                         "description": "Software Engineer",
                         "location": "Delhi",
                         "job_type": "Full Time",

@@ -1,5 +1,6 @@
 from typing import Union
 from beanie import PydanticObjectId
+from fastapi import HTTPException
 
 import database.models.models as DbUserModels
 
@@ -57,3 +58,31 @@ async def get_job_seeker_by_email(email: str) -> Union[dict, None]:
     if job_seeker:
         return job_seeker
     return None
+
+
+async def update_img(img_url, userId) -> (DbUserModels.Recruiter, Union[str, None]):
+    update_query = {"$set": {
+        "img_url": img_url,
+        "bgimg_url": ""
+    }}
+    to_update_profile = await get_job_seeker_profile_by_userId(userId)
+    past_img_url = to_update_profile.img_url
+    updated_profile = await to_update_profile.update(update_query)
+    return updated_profile, past_img_url
+
+async def get_img(userId) -> (Union[str, None]):
+    profile = await get_job_seeker_profile_by_userId(userId)
+    return profile.img_url
+
+# for deletion of job from list of jobseeker
+async def update_applied_job(userId: str,removed_jobs: list) -> bool:
+    update_query = {"$pull":{
+        "jobs_applied":{
+            "$in":removed_jobs
+        }
+    }}
+    to_update_profile = await get_job_seeker_profile_by_userId(userId)
+    updated_profile = await to_update_profile.update(update_query)
+    if updated_profile:
+        return True
+    return False

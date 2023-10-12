@@ -32,3 +32,20 @@ async def get_recruiter_by_email(email: str) -> Union[dict, None]:
     if company:
         return company
     return None
+
+async def update_img(img_url, bgimg_url, userId) -> (DbUserModels.Recruiter, Union[str, None]):
+    update_query = {"$set": {
+        "img_url": img_url,
+        "bgimg_url": bgimg_url
+    }}
+    to_update_profile = await get_recruiter_profile_by_userId(userId)
+    past_img_url = to_update_profile.img_url
+    past_bgimg_url = to_update_profile.bgimg_url
+    updated_profile = await to_update_profile.update(update_query)
+    return updated_profile, past_img_url,past_bgimg_url
+
+async def get_img(userId) -> (Union[str, None]):
+    profile = await get_recruiter_profile_by_userId(userId)
+    return profile.img_url,profile.bgimg_url
+
+
