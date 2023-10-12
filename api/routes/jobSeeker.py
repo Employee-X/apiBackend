@@ -2,6 +2,8 @@ import datetime
 from typing import Optional
 from fastapi import Body, APIRouter, HTTPException, Depends, UploadFile, File, logger
 from passlib.context import CryptContext
+from beanie import PydanticObjectId
+
 
 from auth.jwt_handler import sign_jwt
 
@@ -72,7 +74,7 @@ async def get_profile(decoded_token: (str,str) = Depends(token_listener)):
 
 # update CV
 @router.post("/updateCV", response_model=api_models.Success_Message_Response)
-async def updateCV(decoded_token: (str,str) = Depends(token_listener),cvobject: UploadFile = File(...),verifobject: UploadFile = File(...)):
+async def updateCV(decoded_token: (str,str) = Depends(token_listener),cvobject: UploadFile = File(...),verifobject: UploadFile = None):
     validated, msg = await validate_user(decoded_token[1], None, None)
     if not validated:
         raise HTTPException(status_code=403, detail=msg)
@@ -80,28 +82,34 @@ async def updateCV(decoded_token: (str,str) = Depends(token_listener),cvobject: 
     new_filename = unique_filename_generator(filename)
     data = cvobject.file._file
     uploads3 = await s3_client.upload_fileobj(filename=new_filename, fileobject=data)
-    filename2 = verifobject.filename
-    new_filename2 = unique_filename_generator(filename2)
-    data2 = verifobject.file._file
-    uploads32 = await s3_client.upload_fileobj(filename=new_filename2, fileobject=data2)
-    if uploads3 and uploads32:
+    if uploads3:
         s3_url = f"https://{s3_client.bucket}.s3.{s3_client.region}.amazonaws.com/{s3_client.key}{new_filename}"
-        s3_url2 = f"https://{s3_client.bucket}.s3.{s3_client.region}.amazonaws.com/{s3_client.key}{new_filename2}"
+        _,s3_url2,__ = await jobSeeker_db.get_cv(decoded_token[1])
         _, past_cv, past_verif_doc = await jobSeeker_db.update_cv(s3_url,s3_url2,decoded_token[1])
         if past_cv:
             status = await s3_client.delete_fileobj(past_cv.split('/')[-1])
             if not status:
                 print("Failed to delete old cv")
-        if past_verif_doc:
-            status = await s3_client.delete_fileobj(past_verif_doc.split('/')[-1])
-            if not status:
-                print("Failed to delete old verif doc")
-
-        return api_models.Success_Message_Response(
-            message = "CV uploaded successfully"
-        )
     else:
         raise HTTPException(status_code=400, detail="Failed to upload")
+    if verifobject:
+        filename2 = verifobject.filename
+        new_filename2 = unique_filename_generator(filename2)
+        data2 = verifobject.file._file
+        uploads32 = await s3_client.upload_fileobj(filename=new_filename2, fileobject=data2)
+        if uploads32:
+            s3_url,_,__ = await jobSeeker_db.get_cv(decoded_token[1])
+            s3_url2 = f"https://{s3_client.bucket}.s3.{s3_client.region}.amazonaws.com/{s3_client.key}{new_filename2}"
+            _, past_cv, past_verif_doc = await jobSeeker_db.update_cv(s3_url,s3_url2,decoded_token[1])
+            if past_verif_doc:
+                status = await s3_client.delete_fileobj(past_verif_doc.split('/')[-1])
+                if not status:
+                    print("Failed to delete old verif doc")
+        else:
+            raise HTTPException(status_code=400, detail="Failed to upload")
+    return api_models.Success_Message_Response(
+            message = "CV uploaded successfully"
+        )
 
 # get CV
 @router.get("/getCV", response_model=api_models.CV_Response)
@@ -113,7 +121,8 @@ async def getCV(decoded_token: (str,str) = Depends(token_listener)):
     if not cv_url:
         raise HTTPException(status_code=404, detail="CV not found")
     if not verif_url:
-        raise HTTPException(status_code=404, detail="Verification document not found")
+        verif_url = ""
+        # raise HTTPException(status_code=404, detail="Verification document not found")
     return api_models.CV_Response(
         cv_url = cv_url,
         verif_doc_url = verif_url,
@@ -160,7 +169,8 @@ async def apply_job(jobId,decoded_token: (str,str) = Depends(token_listener)):
         raise HTTPException(status_code=403, detail=msg)
     profile = await jobSeeker_db.get_job_seeker_profile_by_userId(decoded_token[1])
     applied_job_ids = profile.jobs_applied
-    if jobId in applied_job_ids:
+    objectID = PydanticObjectId(jobId)
+    if objectID in applied_job_ids:
         raise HTTPException(status_code=403, detail="Already applied for this job")
     job = await job_db.get_job_by_id(jobId)
     if not job:
@@ -180,9 +190,15 @@ async def get_applied_jobs(decoded_token: (str,str) = Depends(token_listener)):
     profile = await jobSeeker_db.get_job_seeker_profile_by_userId(decoded_token[1])
     applied_job_ids = profile.jobs_applied
     apiJobs = []
+    removed_jobs = []
     for job_id in applied_job_ids:
         job = await job_db.get_job_by_id(str(job_id))
-        apiJobs.append(convertors.dbJobToApiJobWithStatus(job,True))
+        if job:
+            apiJobs.append(convertors.dbJobToApiJobWithStatus(job,True))
+        else:
+            removed_jobs.append(job_id)
+    if len(removed_jobs)>0:
+        _ = await jobSeeker_db.update_applied_job(decoded_token[1],removed_jobs)
     return api_models.Seeker_Job_List(
         jobs = apiJobs
     )
@@ -227,3 +243,42 @@ async def verify_otp(decoded_token: (str,str) = Depends(token_listener),otp_inpu
                 message = "Account verified successfully"
             )
     raise HTTPException(status_code=403, detail="OTP is invalid or expired")
+
+
+#update profile image
+@router.post("/updateIMG",response_model=api_models.Success_Message_Response)
+async def updateIMG(decode_token: (str,str) = Depends(token_listener),imgobject: UploadFile = File(...)):
+    validated,msg = await validate_user(decode_token[1],None,None)
+    if not validated:
+        raise HTTPException(status_code=403, detail=msg)
+    filename = imgobject.filename
+    new_filename = unique_filename_generator(filename)
+    data = imgobject.file._file
+    upload3 = await s3_client.upload_fileobj(filename=new_filename, fileobject=data)
+    if upload3:
+        s3_url = f"https://{s3_client.bucket}.s3.{s3_client.region}.amazonaws.com/{s3_client.key}{new_filename}"
+        _, past_img = await jobSeeker_db.update_img(s3_url,decode_token[1])
+        if past_img:
+            status = await s3_client.delete_fileobj(past_img.split('/')[-1])
+            if not status:
+                print("Failed to delete old image")
+        return api_models.Success_Message_Response(
+            message = "Images uploaded successfully"
+        )
+    else:
+        raise HTTPException(status_code = 400, detail="Failed to upload")
+    
+#get profile image
+@router.get("/getIMG", response_model = api_models.IMG_Response)
+async def getIMG(decoded_token: (str,str) = Depends(token_listener)):
+    validated, msg = await validate_user(decoded_token[1],None,None)
+    if not validated:
+        raise HTTPException(status_code=403, detail=msg)
+    img_url = await jobSeeker_db.get_img(decoded_token[1])
+    if not img_url:
+        raise HTTPException(status_code=404,detail="image not found")
+    return api_models.IMG_Response(
+        img_url = img_url,
+        bgimg_url = ""
+    )
+

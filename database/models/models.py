@@ -53,6 +53,7 @@ class Job_Seeker(Document):
     cv_url: Optional[str] = None
     verification_doc_url: Optional[str] = None
     cv_verified_status: bool = False
+    img_url: Optional[str] = None
 
     jobs_applied: List[PydanticObjectId] = []
 
@@ -73,6 +74,7 @@ class Job_Seeker(Document):
                 "cv_url": "https://aws.s3.com/abc123.pdf",
                 "verification_doc_url": "https://aws.s3.com/abc123.pdf",
                 "cv_verified_status": False,
+                "img_url": "https://aws.s3.com/abc123.pdf",
                 "jobs_applied": ["1234567890"],
             }
         }
@@ -116,6 +118,9 @@ class Recruiter(Document):
     address: Optional[str] = None
     phone_number: PhoneNumber
     linkedin: Optional[str] = None
+    description: Optional[str] = None
+    img_url: Optional[str] = None
+    bgimg_url: Optional[str] = None
 
     class Config:
         json_schema_extra = {
@@ -127,6 +132,9 @@ class Recruiter(Document):
                 "address": "IIT Delhi, Hauz Khas, New Delhi, 110016",
                 "phone_number": "+918888887777",
                 "linkedin": "xyz",
+                "description": "I am a recruiter.",
+                "img_url":"https://aws.s3.com/abc123.jpg",
+                "bgimg_url":"https://aws.s3.com/abc123.jpg"
             }
         }
 
@@ -136,6 +144,7 @@ class Recruiter(Document):
 class Job(Document):
     recruiterId: PydanticObjectId
     company_name: Optional[str] = None
+    logo: Optional[str] = None
     title: Optional[str] = None
     description: Optional[str] = None
     location: Optional[str] = None
@@ -152,6 +161,7 @@ class Job(Document):
             "example": {
                 "recruiterId": "1234567890",
                 "company_name": "employeeX",
+                "logo": "https://aws.s3.com/abc123.pdf",
                 "title": "Software Engineer",
                 "description": "Software Engineer",
                 "location": "Delhi",

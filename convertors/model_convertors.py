@@ -41,6 +41,7 @@ def dbJobSeekerProfileToApiJobSeekerProfileWithIdCv(profile: DbUserModels.Job_Se
         cv_url= profile.cv_url,
         verification_doc_url= profile.verification_doc_url,
         cv_verified_status= profile.cv_verified_status,
+        img_url = profile.img_url,
     )
 
 def apiRecruiterProfileToDbRecruiterProfile(profile: apiModels.Recruiter_Profile, userId: PydanticObjectId) -> DbUserModels.Recruiter:
@@ -52,6 +53,7 @@ def apiRecruiterProfileToDbRecruiterProfile(profile: apiModels.Recruiter_Profile
         address= profile.address,
         phone_number= profile.phone_number,
         linkedin= profile.linkedin,
+        descripion=profile.description,
     )
 
 def apiCollegeProfileToDbCollegeProfile(profile: apiModels.College_Profile, userId: PydanticObjectId) -> DbUserModels.College:
@@ -87,6 +89,7 @@ def dbJobSeekerProfileToApiJobSeekerProfile(profile: DbUserModels.Job_Seeker) ->
         profession = profile.profession,
         description = profile.description,
         skills= profile.skills,
+        img_url = profile.img_url,
     )
 
 def dbRecruiterProfileToApiRecruiterProfile(profile: DbUserModels.Recruiter) -> apiModels.Recruiter_Profile:
@@ -97,12 +100,14 @@ def dbRecruiterProfileToApiRecruiterProfile(profile: DbUserModels.Recruiter) -> 
         address= profile.address,
         phone_number= profile.phone_number,
         linkedin= profile.linkedin,
+        description=profile.description,
     )
 
-def apiJobToDbJob(job: apiModels.Job, recruiterId: PydanticObjectId) -> DbUserModels.Job:
+def apiJobToDbJob(job: apiModels.Job, recruiterId: PydanticObjectId,logo_url: str) -> DbUserModels.Job:
     return DbUserModels.Job(
         recruiterId = recruiterId,
         company_name= job.company_name,
+        logo = logo_url,
         title = job.title,
         description = job.description,
         location= job.location,
@@ -127,6 +132,7 @@ def dbJobToApiJobWithId(job: DbUserModels.Job) -> apiModels.Job_with_id:
         perks= job.perks,
         status= job.status,
         company_name= job.company_name,
+        logo = job.logo,
     )
 
 def dbJobToApiJobWithStatus(job: DbUserModels.Job, status: bool) -> apiModels.Job_with_status:
@@ -143,4 +149,5 @@ def dbJobToApiJobWithStatus(job: DbUserModels.Job, status: bool) -> apiModels.Jo
         status= job.status,
         company_name= job.company_name,
         application_status= status,
+        logo = job.logo,
     )

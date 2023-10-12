@@ -1,5 +1,5 @@
 from typing import Optional
-from fastapi import Body, APIRouter, HTTPException, Depends
+from fastapi import Body, APIRouter, HTTPException, Depends, UploadFile, File, logger
 from passlib.context import CryptContext
 from beanie import PydanticObjectId
 
@@ -12,6 +12,10 @@ import database.functions.job as job_db
 import convertors.model_convertors as convertors
 import api.models.models as api_models
 from auth.jwt_bearer import JWTBearer
+from utils.utils import unique_filename_generator
+from config.config import s3_client
+
+
 
 token_listener = JWTBearer()
 
@@ -66,7 +70,8 @@ async def add_job(decoded_token: (str,str) = Depends(token_listener),job: api_mo
     company_name = recruiter.company_name
     if job.company_name != company_name:
         raise HTTPException(status_code=403, detail="Company name does not match")
-    dbJob = convertors.apiJobToDbJob(job, PydanticObjectId(decoded_token[1]))
+    logo = recruiter.img_url
+    dbJob = convertors.apiJobToDbJob(job, PydanticObjectId(decoded_token[1]),logo)
     _ = await job_db.add_job(dbJob)
 
     return api_models.Success_Message_Response(
@@ -97,7 +102,7 @@ async def update_job(jobId,decoded_token: (str,str) = Depends(token_listener),jo
     company_name = recruiter.company_name
     if job.company_name != company_name:
         raise HTTPException(status_code=403, detail="Company name does not match")
-    dbJob = convertors.apiJobToDbJob(job, PydanticObjectId(decoded_token[1]))
+    dbJob = convertors.apiJobToDbJob(job, PydanticObjectId(decoded_token[1]),job.logo,job.company_name)
     print(dbJob)
     _ = await job_db.update_job(dbJob,jobId)
 
@@ -113,7 +118,7 @@ async def delete_job(jobId,decoded_token: (str,str) = Depends(token_listener)):
         raise HTTPException(status_code=403, detail=msg)
 
     _ = await job_db.delete_job(jobId)
-
+    
     return api_models.Success_Message_Response(
         message = "Job deleted successfully"
     )
@@ -149,3 +154,77 @@ async def get_user_profile(userId,decoded_token: (str,str) = Depends(token_liste
         raise HTTPException(status_code=404, detail="Profile not found")
     apiProfile = convertors.dbJobSeekerProfileToApiJobSeekerProfileWithIdCv(profile)
     return apiProfile
+
+#remove job applicants
+@router.delete("/removeApplicant/{userId}/{jobId}",response_model=api_models.Success_Message_Response)
+async def remove_job_applicant(userId,jobId,decoded_token: (str,str) = Depends(token_listener)):
+    validated, msg = await validate_user(decoded_token[1], None, None)
+    if not validated:
+        raise HTTPException(status_code=403, detail=msg)
+    job = await job_db.get_job_by_id(jobId)
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    _ = await job_db.update_applicant_list(jobId,userId)
+    _ = await jobSeeker_db.update_applied_job(userId,[PydanticObjectId(jobId)])
+    return api_models.Success_Message_Response(
+        message = "Applicant removed successfully"
+    )
+
+
+
+#update company logo/image
+@router.post("/updateIMG",response_model=api_models.Success_Message_Response)
+async def updateIMG(decode_token: (str,str) = Depends(token_listener),imgobject: UploadFile = None,bgimgobject: UploadFile = None):
+    validated,msg = await validate_user(decode_token[1],None,None)
+    if not validated:
+        raise HTTPException(status_code=403, detail=msg)
+    if imgobject:
+        filename = imgobject.filename
+        new_filename = unique_filename_generator(filename)
+        data = imgobject.file._file
+        upload3 = await s3_client.upload_fileobj(filename=new_filename, fileobject=data)
+        if upload3:
+            s3_url = f"https://{s3_client.bucket}.s3.{s3_client.region}.amazonaws.com/{s3_client.key}{new_filename}"
+            _,s3_url2 = await recruiter_db.get_img(decode_token[1])
+            _, past_img,past_bgimg = await recruiter_db.update_img(s3_url,s3_url2,decode_token[1])
+            if past_img:
+                status = await s3_client.delete_fileobj(past_img.split('/')[-1])
+                if not status:
+                    print("Failed to delete old image")
+        else:
+            raise HTTPException(status_code = 400, detail="Failed to upload")
+    if bgimgobject:
+        filename2 = bgimgobject.filename
+        new_filename2 = unique_filename_generator(filename2)
+        data2 = bgimgobject.file._file
+        upload32 = await s3_client.upload_fileobj(filename=new_filename2,fileobject=data2)
+        if upload32:
+            s3_url,_ = await recruiter_db.get_img(decode_token[1])
+            s3_url2 = f"https://{s3_client.bucket}.s3.{s3_client.region}.amazonaws.com/{s3_client.key}{new_filename2}"
+            _, past_img,past_bgimg = await recruiter_db.update_img(s3_url,s3_url2,decode_token[1])
+            if past_bgimg:
+                status = await s3_client.delete_fileobj(past_bgimg.split('/0')[-1])
+                if not status:
+                    print("Failed to delete old backgound")
+        else:
+            raise HTTPException(status_code = 400, detail="Failed to upload")
+    return api_models.Success_Message_Response(
+        message = "Images uploaded successfully"
+    )
+    
+#get image/logo
+@router.get("/getIMG", response_model = api_models.IMG_Response)
+async def getIMG(decoded_token: (str,str) = Depends(token_listener)):
+    validated, msg = await validate_user(decoded_token[1],None,None)
+    if not validated:
+        raise HTTPException(status_code=403, detail=msg)
+    img_url,bgimg_url = await recruiter_db.get_img(decoded_token[1])
+    if not img_url:
+        raise HTTPException(status_code=404,detail="image not found")
+    if not bgimg_url:
+        raise HTTPException(status_code=404, detail="bgimage not found")
+    return api_models.IMG_Response(
+        img_url = img_url,
+        bgimg_url = bgimg_url
+    )
+

@@ -1,6 +1,5 @@
 from typing import List, Union
 from beanie import PydanticObjectId
-
 import database.models.models as DbUserModels
 
 
@@ -49,8 +48,16 @@ async def delete_job(job_id: str) -> bool:
         result = None
         return False
 
-async def apply_job(jobId: str, userId: str):
+async def apply_job(jobId: str, userId: str) -> bool:
     update_query = {"$push": {
+        "applicants": PydanticObjectId(userId)
+    }}
+    to_update_job = await get_job_by_id(jobId)
+    updated_job = await to_update_job.update(update_query)
+    return updated_job
+
+async def update_applicant_list(jobId: str,userId: str) -> bool:
+    update_query = {"$pull":{
         "applicants": PydanticObjectId(userId)
     }}
     to_update_job = await get_job_by_id(jobId)
