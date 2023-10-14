@@ -2,7 +2,7 @@ from beanie import Document
 from pydantic import EmailStr
 from pydantic_extra_types.phone_numbers import PhoneNumber
 from beanie import PydanticObjectId
-from typing import Optional, List
+from typing import Optional, List, Dict
 
 from utils.utils import Roles,Gender,Profession,Skills
 
@@ -121,6 +121,7 @@ class Recruiter(Document):
     description: Optional[str] = None
     img_url: Optional[str] = None
     bgimg_url: Optional[str] = None
+    coins: Optional[str] = None
 
     class Config:
         json_schema_extra = {
@@ -134,7 +135,8 @@ class Recruiter(Document):
                 "linkedin": "xyz",
                 "description": "I am a recruiter.",
                 "img_url":"https://aws.s3.com/abc123.jpg",
-                "bgimg_url":"https://aws.s3.com/abc123.jpg"
+                "bgimg_url":"https://aws.s3.com/abc123.jpg",
+                "coins":"absdjkfjd=dksd"
             }
         }
 
@@ -154,7 +156,9 @@ class Job(Document):
     skills: List[Skills] = []
     perks: Optional[str] = None
     status: Optional[str] = None
-    applicants: List[PydanticObjectId] = []
+    applicants: Optional[Dict[PydanticObjectId,bool]] = {}
+    no_of_applicants: Optional[int] = 0
+    date_posted: Optional[str] = None
 
     class Config:
         json_schema_extra = {
@@ -171,7 +175,9 @@ class Job(Document):
                 "skills": ["Python", "Java", "JavaScript"],
                 "perks": "Health Insurance, Free Food",
                 "status": "active",
-                "applicants": ["1234567890"],
+                "applicants": {"1234567890":False},
+                "no_of_applicants": "5",
+                "date_posted": "2002-05-05"
             }
         }
 

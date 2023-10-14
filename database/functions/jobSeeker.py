@@ -75,7 +75,7 @@ async def get_img(userId) -> (Union[str, None]):
     return profile.img_url
 
 # for deletion of job from list of jobseeker
-async def update_applied_job(userId: str,removed_jobs: list) -> bool:
+async def update_applied_job_list(userId: str,removed_jobs: list) -> bool:
     update_query = {"$pull":{
         "jobs_applied":{
             "$in":removed_jobs

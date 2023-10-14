@@ -161,6 +161,25 @@ async def get_job(jobId,decoded_token: (str,str) = Depends(token_listener)):
     apiJob = convertors.dbJobToApiJobWithStatus(job,status)
     return apiJob
 
+# jobs by filtering
+@router.get("/filteredJobs",response_model=api_models.Seeker_Job_List)
+async def get_jobs_by_filter(decoded_token: (str,str) = Depends(token_listener),location: str = None,job_type: str= None,category: str = None):
+    validated, msg = await validate_user(decoded_token[1], None, None)
+    if not validated:
+        raise HTTPException(status_code=403, detail=msg)
+    profile = await jobSeeker_db.get_job_seeker_profile_by_userId(decoded_token[1])
+    applied_job_ids = profile.jobs_applied
+    jobs = await job_db.get_job_by_filter(category,location,job_type)
+    if not jobs:
+        raise HTTPException(status_code = 404, detail="Jobs not found")
+    apiJobs = []
+    for job in jobs:
+        status = job.id in applied_job_ids
+        apiJobs.append(convertors.dbJobToApiJobWithStatus(job,status))
+    return api_models.Seeker_Job_List(
+        jobs = apiJobs
+    )
+
 # apply for job
 @router.put("/applyJob/{jobId}", response_model=api_models.Success_Message_Response)
 async def apply_job(jobId,decoded_token: (str,str) = Depends(token_listener)):
@@ -198,7 +217,7 @@ async def get_applied_jobs(decoded_token: (str,str) = Depends(token_listener)):
         else:
             removed_jobs.append(job_id)
     if len(removed_jobs)>0:
-        _ = await jobSeeker_db.update_applied_job(decoded_token[1],removed_jobs)
+        _ = await jobSeeker_db.update_applied_job_list(decoded_token[1],removed_jobs)
     return api_models.Seeker_Job_List(
         jobs = apiJobs
     )
@@ -281,4 +300,3 @@ async def getIMG(decoded_token: (str,str) = Depends(token_listener)):
         img_url = img_url,
         bgimg_url = ""
     )
-
