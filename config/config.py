@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     # JWT
     secret_key: str = "secret"
     algorithm: str = "HS256"
+    AES_KEY: str = "AES128"
 
     # AWS S3 Configuration
     AWS_ACCESS_KEY_ID: Optional[str] = None

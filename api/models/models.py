@@ -128,8 +128,30 @@ class Job_Seeker_Profile_With_Id_CV(Job_Seeker_Profile):
             }
         }
 
+class Job_Seeker_Profile_Without_CV(BaseModel):
+    id: str
+    fullname: str
+    college: Optional[str]
+    gender: Optional[str]
+    skills: List[Skills] = []
+    img_url: Optional[str]
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "id": "1234567890",
+                "fullname": "Loren Ipsum  Dolor",
+                "college": "University of Virginia", 
+                "gender": "male",
+                "skills": ["Python", "Java", "JavaScript"],
+                "img_url": "https://aws.s3.com/abc123.pdf",
+            }
+        }
+
+
+
 class Seeker_List(BaseModel):
-    applicants: List[Job_Seeker_Profile_With_Id_CV] = []
+    applicants: List[Job_Seeker_Profile_Without_CV] = []
 
     class Config:
         json_schema_extra = {
@@ -138,35 +160,17 @@ class Seeker_List(BaseModel):
                     {
                         "id": "1234567890",
                         "fullname": "Loren Ipsum  Dolor",
-                        "college": "University of Virginia",
-                        "email": "abc123@gmail.com",
+                        "college": "University of Virginia", 
                         "gender": "male",
-                        "phone_number": "+918888887777",
-                        "date_of_birth": "2002-05-05",
-                        "profession": ["student"],
-                        "about": "I am a student",
-                        "description": "I am a student",
                         "skills": ["Python", "Java", "JavaScript"],
-                        "cv_url": "https://aws.s3.com/abc123.pdf",
-                        "verification_doc_url": "https://aws.s3.com/abc123.pdf",
-                        "cv_verified_status": False,
                         "img_url": "https://aws.s3.com/abc123.pdf",
                     },
                     {
                         "id": "1234567890",
                         "fullname": "Loren Ipsum  Dolor",
-                        "college": "University of Virginia",
-                        "email": "abc123@gmail.com",
+                        "college": "University of Virginia", 
                         "gender": "male",
-                        "phone_number": "+918888887777",
-                        "date_of_birth": "2002-05-05",
-                        "profession": ["student"],
-                        "about": "I am a student",
-                        "description": "I am a student",
                         "skills": ["Python", "Java", "JavaScript"],
-                        "cv_url": "https://aws.s3.com/abc123.pdf",
-                        "verification_doc_url": "https://aws.s3.com/abc123.pdf",
-                        "cv_verified_status": False,
                         "img_url": "https://aws.s3.com/abc123.pdf",
                     },
                 ]
@@ -244,6 +248,14 @@ class IMG_Response(BaseModel):
             }
         }
 
+class Coin(BaseModel):
+    coins: str
+    class Config:
+        json_schema_extra={
+            "example":{
+                "coins":"absdjkfjd=dksd"
+            }   
+        }
 
 class Success_Message_Response(BaseModel):
     message: str
@@ -287,6 +299,8 @@ class Job(BaseModel):
 
 class Job_with_id(Job):
     id: str
+    no_of_applicants: Optional[int] = None
+    date_posted: Optional[str] = None
 
     class Config:
         json_schema_extra = {
@@ -303,6 +317,8 @@ class Job_with_id(Job):
                 "skills": ["Python", "Java", "JavaScript"],
                 "perks": "Health Insurance, Free Food",
                 "status": "active",
+                "no_of_applicants": "5",
+                "date_posted": "2002-05-05"
             }
         }
 
@@ -325,6 +341,8 @@ class Job_with_status(Job_with_id):
                 "perks": "Health Insurance, Free Food",
                 "status": "active",
                 "application_status": False,
+                "no_of_applicants": "5",
+                "date_posted": "2002-05-05"
             }
         }
 
@@ -348,6 +366,8 @@ class Job_List(BaseModel):
                         "skills": ["Python", "Java", "JavaScript"],
                         "perks": "Health Insurance, Free Food",
                         "status": "active",
+                        "no_of_applicants": "5",
+                        "date_posted": "2002-05-05"
                     },
                     {
                         "id": "1234567890",
@@ -362,6 +382,8 @@ class Job_List(BaseModel):
                         "skills": ["Python", "Java", "JavaScript"],
                         "perks": "Health Insurance, Free Food",
                         "status": "active",
+                        "no_of_applicants": "5",
+                        "date_posted": "2002-05-05"
                     },
                 ]
             }
@@ -387,6 +409,8 @@ class Seeker_Job_List(BaseModel):
                         "skills": ["Python", "Java", "JavaScript"],
                         "perks": "Health Insurance, Free Food",
                         "status": "active",
+                        "no_of_applicants": "5",
+                        "date_posted": "2002-05-05",
                         "application_status": False,
                     },
                     {
@@ -402,6 +426,8 @@ class Seeker_Job_List(BaseModel):
                         "skills": ["Python", "Java", "JavaScript"],
                         "perks": "Health Insurance, Free Food",
                         "status": "active",
+                        "no_of_applicants": "5",
+                        "date_posted": "2002-05-05",
                         "application_status": False,
                     },
                 ]

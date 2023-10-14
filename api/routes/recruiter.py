@@ -14,6 +14,8 @@ import api.models.models as api_models
 from auth.jwt_bearer import JWTBearer
 from utils.utils import unique_filename_generator
 from config.config import s3_client
+from auth.aes_security import *
+from business.policy import *
 
 
 
@@ -73,7 +75,10 @@ async def add_job(decoded_token: (str,str) = Depends(token_listener),job: api_mo
     logo = recruiter.img_url
     dbJob = convertors.apiJobToDbJob(job, PydanticObjectId(decoded_token[1]),logo)
     _ = await job_db.add_job(dbJob)
-
+    coins = await recruiter_db.get_coins(decoded_token[1])
+    new_coin_value = int(decrypt(coins)) + COINS_ON_NEW_JOB
+    coins = encrypt(str(new_coin_value))
+    _ = await recruiter_db.update_coin(decoded_token[1],coins)
     return api_models.Success_Message_Response(
         message = "Job added successfully"
     )
@@ -133,25 +138,37 @@ async def get_job_applicants(jobId,decoded_token: (str,str) = Depends(token_list
     job = await job_db.get_job_by_id(jobId)
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
-    applicants = job.applicants
+    applicants = job.applicants.keys()
     apiApplicants = []
     for applicant_id in applicants:
         applicant = await jobSeeker_db.get_job_seeker_profile_by_userId(str(applicant_id))
-        apiApplicants.append(convertors.dbJobSeekerProfileToApiJobSeekerProfileWithIdCv(applicant))
+        apiApplicants.append(convertors.dbJobseekerToApiRecruiterWithoutCV(applicant))
     return api_models.Seeker_List(
         applicants=apiApplicants
     )
 
 # get user profile
 @router.get("/getUserProfile/{userId}", response_model=api_models.Job_Seeker_Profile_With_Id_CV)
-async def get_user_profile(userId,decoded_token: (str,str) = Depends(token_listener)):
+async def get_user_profile(userId,job_id,decoded_token: (str,str) = Depends(token_listener)):
     validated, msg = await validate_user(decoded_token[1], None, None)
     if not validated:
         raise HTTPException(status_code=403, detail=msg)
-
     profile = await jobSeeker_db.get_job_seeker_profile_by_userId(userId)
     if not profile:
         raise HTTPException(status_code=404, detail="Profile not found")
+    job_profile = await job_db.get_job_by_id(job_id)
+    if not job_profile:
+        raise HTTPException(status_code=404, detail="Job not found")
+    is_visited_profile = job_profile.applicants[PydanticObjectId(userId)]
+    if not is_visited_profile:
+        coins = await recruiter_db.get_coins(decoded_token[1])
+        value_of_coins = int(decrypt(coins))
+        new_value = value_of_coins - COINS_DECREASE_ON_CV_VIEW
+        if new_value<0:
+            HTTPException(status_code=404,detail="Insufficient Coins")
+        coins = encrypt(str(new_value))
+        _ = await recruiter_db.update_coin(decoded_token[1],coins)
+        _ = await job_db.mark_visited_applicant(job_id,userId)
     apiProfile = convertors.dbJobSeekerProfileToApiJobSeekerProfileWithIdCv(profile)
     return apiProfile
 
@@ -165,7 +182,7 @@ async def remove_job_applicant(userId,jobId,decoded_token: (str,str) = Depends(t
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
     _ = await job_db.update_applicant_list(jobId,userId)
-    _ = await jobSeeker_db.update_applied_job(userId,[PydanticObjectId(jobId)])
+    _ = await jobSeeker_db.update_applied_job_list(userId,[PydanticObjectId(jobId)])
     return api_models.Success_Message_Response(
         message = "Applicant removed successfully"
     )
@@ -228,3 +245,32 @@ async def getIMG(decoded_token: (str,str) = Depends(token_listener)):
         bgimg_url = bgimg_url
     )
 
+
+#get coins
+@router.get("/getCoin", response_model = api_models.Coin)
+async def getCoin(decoded_token: (str,str) = Depends(token_listener)):
+    validated, msg = await validate_user(decoded_token[1],None,None)
+    if not validated:
+        raise HTTPException(status_code=403,detail=msg)
+    coins = await recruiter_db.get_coins(decoded_token[1])
+    if not coins:
+        raise HTTPException(status_code=404,detail="coin not fetched")
+    return api_models.Coin(
+        coins = coins
+    )
+
+#addCoin
+@router.post("/addCoin",response_model = api_models.Success_Message_Response)
+async def addCoins(decoded_token: (str,str) = Depends(token_listener),amount: str = encrypt('0')):
+    validated, msg = await validate_user(decoded_token[1],None,None)
+    if not validated:
+        raise HTTPException(status_code=403,detail=msg)
+    coins = await recruiter_db.get_coins(decoded_token[1])
+    if not coins:
+        raise HTTPException(status_code=404,detail="coin not fetched")
+    amount = int(decrypt(coins)) + int(decrypt(amount))
+    coins = encrypt(str(amount))
+    _ = await recruiter_db.update_coin(decoded_token[1],coins)
+    return api_models.Success_Message_Response(
+        message = "Coins added successfully"
+    )

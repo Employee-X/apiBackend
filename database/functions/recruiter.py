@@ -1,5 +1,7 @@
 from typing import Union
 from beanie import PydanticObjectId
+from fastapi import HTTPException
+from auth.aes_security import encrypt,decrypt 
 
 import database.models.models as DbUserModels
 
@@ -49,3 +51,14 @@ async def get_img(userId) -> (Union[str, None]):
     return profile.img_url,profile.bgimg_url
 
 
+async def get_coins(userId) -> str:
+    profile = await get_recruiter_profile_by_userId(userId)
+    return profile.coins
+
+async def update_coin(userId,value) -> str:
+    update_query = {"$set":{
+        "coins": value
+    }}
+    to_update_profile = await get_recruiter_profile_by_userId(userId)
+    updated_profile = await to_update_profile.update(update_query)
+    return updated_profile
