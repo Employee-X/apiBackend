@@ -135,6 +135,8 @@ class Job_Seeker_Profile_Without_CV(BaseModel):
     gender: Optional[str]
     skills: List[Skills] = []
     img_url: Optional[str]
+    description: Optional[str]
+    visited: Optional[bool]
 
     class Config:
         json_schema_extra = {
@@ -145,6 +147,8 @@ class Job_Seeker_Profile_Without_CV(BaseModel):
                 "gender": "male",
                 "skills": ["Python", "Java", "JavaScript"],
                 "img_url": "https://aws.s3.com/abc123.pdf",
+                "description": "I am a student",
+                "visited": "false",
             }
         }
 
@@ -164,6 +168,7 @@ class Seeker_List(BaseModel):
                         "gender": "male",
                         "skills": ["Python", "Java", "JavaScript"],
                         "img_url": "https://aws.s3.com/abc123.pdf",
+                        "description": "I am a student",
                     },
                     {
                         "id": "1234567890",
@@ -172,6 +177,7 @@ class Seeker_List(BaseModel):
                         "gender": "male",
                         "skills": ["Python", "Java", "JavaScript"],
                         "img_url": "https://aws.s3.com/abc123.pdf",
+                        "description": "I am a student",
                     },
                 ]
             }
@@ -279,6 +285,7 @@ class Job(BaseModel):
     skills: List[Skills] = []
     perks: Optional[str] = None
     status: Optional[str] = None
+    category: Optional[str] = None
 
     class Config:
         json_schema_extra = {
@@ -294,6 +301,7 @@ class Job(BaseModel):
                 "skills": ["Python", "Java", "JavaScript"],
                 "perks": "Health Insurance, Free Food",
                 "status": "active",
+                "category": "IT",
             }
         }
 
@@ -317,8 +325,10 @@ class Job_with_id(Job):
                 "skills": ["Python", "Java", "JavaScript"],
                 "perks": "Health Insurance, Free Food",
                 "status": "active",
+                "category": "IT",
                 "no_of_applicants": "5",
                 "date_posted": "2002-05-05"
+                
             }
         }
 
@@ -340,6 +350,7 @@ class Job_with_status(Job_with_id):
                 "skills": ["Python", "Java", "JavaScript"],
                 "perks": "Health Insurance, Free Food",
                 "status": "active",
+                "category": "IT",
                 "application_status": False,
                 "no_of_applicants": "5",
                 "date_posted": "2002-05-05"
@@ -366,6 +377,7 @@ class Job_List(BaseModel):
                         "skills": ["Python", "Java", "JavaScript"],
                         "perks": "Health Insurance, Free Food",
                         "status": "active",
+                        "category": "IT",
                         "no_of_applicants": "5",
                         "date_posted": "2002-05-05"
                     },
@@ -382,6 +394,7 @@ class Job_List(BaseModel):
                         "skills": ["Python", "Java", "JavaScript"],
                         "perks": "Health Insurance, Free Food",
                         "status": "active",
+                        "category": "IT",
                         "no_of_applicants": "5",
                         "date_posted": "2002-05-05"
                     },
@@ -409,6 +422,7 @@ class Seeker_Job_List(BaseModel):
                         "skills": ["Python", "Java", "JavaScript"],
                         "perks": "Health Insurance, Free Food",
                         "status": "active",
+                        "category": "IT",
                         "no_of_applicants": "5",
                         "date_posted": "2002-05-05",
                         "application_status": False,
@@ -426,6 +440,7 @@ class Seeker_Job_List(BaseModel):
                         "skills": ["Python", "Java", "JavaScript"],
                         "perks": "Health Insurance, Free Food",
                         "status": "active",
+                        "category": "IT",
                         "no_of_applicants": "5",
                         "date_posted": "2002-05-05",
                         "application_status": False,

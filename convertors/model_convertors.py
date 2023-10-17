@@ -3,7 +3,8 @@ import database.models.models as DbUserModels
 from beanie import PydanticObjectId
 import database.functions.recruiter as recruiter_db
 from business.policy import *
-from datetime import date
+from datetime import date,timezone,datetime,timedelta
+from auth.aes_security import * 
 
 def apiUserToDbUser(user: apiModels.User_SignUp) -> DbUserModels.User:
     return DbUserModels.User(
@@ -47,14 +48,16 @@ def dbJobSeekerProfileToApiJobSeekerProfileWithIdCv(profile: DbUserModels.Job_Se
         img_url = profile.img_url,
     )
 
-def dbJobseekerToApiRecruiterWithoutCV(profile: DbUserModels.Job_Seeker) -> apiModels.Job_Seeker_Profile_Without_CV:
+def dbJobseekerToApiRecruiterWithoutCV(profile: DbUserModels.Job_Seeker,visited: bool) -> apiModels.Job_Seeker_Profile_Without_CV:
     return apiModels.Job_Seeker_Profile_Without_CV(
         id = str(profile.userId),
         fullname = profile.fullname,
         college=profile.college,
         gender=profile.gender,
         skills=profile.skills,
-        img_url = profile.img_url
+        img_url = profile.img_url,
+        description = profile.description,
+        visited = visited,
     )
 
 
@@ -68,7 +71,7 @@ def apiRecruiterProfileToDbRecruiterProfile(profile: apiModels.Recruiter_Profile
         phone_number= profile.phone_number,
         linkedin= profile.linkedin,
         descripion=profile.description,
-        coins=recruiter_db.encrypt(str(VERIFIED_RECRUITER_COINS))
+        coins=encrypt(str(VERIFIED_RECRUITER_COINS))
     )
 
 def apiCollegeProfileToDbCollegeProfile(profile: apiModels.College_Profile, userId: PydanticObjectId) -> DbUserModels.College:
@@ -133,7 +136,9 @@ def apiJobToDbJob(job: apiModels.Job, recruiterId: PydanticObjectId,logo_url: st
         perks= job.perks,
         status= job.status,
         no_of_applicants = 0,
-        date_posted = str(date.today())
+        date_posted = str(datetime.now(timezone(timedelta(hours=+5.5),'IST')).date()),
+        category =job.category,
+        coins=encrypt(str(COINS_ON_NEW_JOB)),
     )
 
 def dbJobToApiJobWithId(job: DbUserModels.Job) -> apiModels.Job_with_id:
@@ -152,6 +157,7 @@ def dbJobToApiJobWithId(job: DbUserModels.Job) -> apiModels.Job_with_id:
         logo = job.logo,
         no_of_applicants = job.no_of_applicants,
         date_posted = job.date_posted,
+        category = job.category,
     )
 
 def dbJobToApiJobWithStatus(job: DbUserModels.Job, status: bool) -> apiModels.Job_with_status:
@@ -171,4 +177,5 @@ def dbJobToApiJobWithStatus(job: DbUserModels.Job, status: bool) -> apiModels.Jo
         logo = job.logo,
         no_of_applicants = job.no_of_applicants,
         date_posted = job.date_posted,
+        category = job.category,
     )
