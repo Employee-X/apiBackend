@@ -1,10 +1,8 @@
 from typing import Union
 from beanie import PydanticObjectId
-from fastapi import HTTPException
-from auth.aes_security import encrypt,decrypt 
 
 import database.models.models as DbUserModels
-
+from auth.aes_security import *
 
 recruiter_collection = DbUserModels.Recruiter
 
@@ -53,6 +51,7 @@ async def get_img(userId) -> (Union[str, None]):
 
 async def get_coins(userId) -> str:
     profile = await get_recruiter_profile_by_userId(userId)
+    return decrypt(profile.coins)
     return profile.coins
 
 async def update_coin(userId,value) -> str:

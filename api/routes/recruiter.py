@@ -121,7 +121,12 @@ async def delete_job(jobId,decoded_token: (str,str) = Depends(token_listener)):
     validated, msg = await validate_user(decoded_token[1], None, None)
     if not validated:
         raise HTTPException(status_code=403, detail=msg)
-
+    # decreasing coins corresponding to that job on deleting job
+    job_profile = await job_db.get_job_by_id(jobId)
+    coins = await recruiter_db.get_coins(decoded_token[1])
+    new_coin_value = int(decrypt(coins)) - int(decrypt(job_profile.coins))
+    coins = encrypt(str(new_coin_value))
+    _ = await recruiter_db.update_coin(decoded_token[1],coins)
     _ = await job_db.delete_job(jobId)
     
     return api_models.Success_Message_Response(
@@ -138,11 +143,11 @@ async def get_job_applicants(jobId,decoded_token: (str,str) = Depends(token_list
     job = await job_db.get_job_by_id(jobId)
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
-    applicants = job.applicants.keys()
+    applicants = job.applicants.items()
     apiApplicants = []
-    for applicant_id in applicants:
+    for applicant_id,visited in applicants:
         applicant = await jobSeeker_db.get_job_seeker_profile_by_userId(str(applicant_id))
-        apiApplicants.append(convertors.dbJobseekerToApiRecruiterWithoutCV(applicant))
+        apiApplicants.append(convertors.dbJobseekerToApiRecruiterWithoutCV(applicant,visited))
     return api_models.Seeker_List(
         applicants=apiApplicants
     )
@@ -161,6 +166,7 @@ async def get_user_profile(userId,job_id,decoded_token: (str,str) = Depends(toke
         raise HTTPException(status_code=404, detail="Job not found")
     is_visited_profile = job_profile.applicants[PydanticObjectId(userId)]
     if not is_visited_profile:
+        # decreasing the total coins and giving insufficint mssg for CV view
         coins = await recruiter_db.get_coins(decoded_token[1])
         value_of_coins = int(decrypt(coins))
         new_value = value_of_coins - COINS_DECREASE_ON_CV_VIEW
@@ -169,6 +175,19 @@ async def get_user_profile(userId,job_id,decoded_token: (str,str) = Depends(toke
         coins = encrypt(str(new_value))
         _ = await recruiter_db.update_coin(decoded_token[1],coins)
         _ = await job_db.mark_visited_applicant(job_id,userId)
+
+        # decreasing coins allocated with the particular job
+        job_assoc_coin = int(decrypt(job_profile.coins))
+        if job_assoc_coin>=COINS_DECREASE_ON_CV_VIEW:
+            job_assoc_coin -= COINS_DECREASE_ON_CV_VIEW
+            _ = await job_db.update_coin(job_id,encrypt(str(job_assoc_coin)))
+        
+        # updating the global coins count and marking the applicant visited
+        coins = encrypt(str(new_value))
+        _ = await recruiter_db.update_coin(decoded_token[1],coins)
+        _ = await job_db.mark_visited_applicant(job_id,userId)
+
+
     apiProfile = convertors.dbJobSeekerProfileToApiJobSeekerProfileWithIdCv(profile)
     return apiProfile
 

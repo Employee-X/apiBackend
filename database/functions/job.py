@@ -37,15 +37,15 @@ async def get_job_by_filter(category: Union[str,None],location: Union[str,None],
     elif category == None and job_type ==None:
         jobs = await job_collection.find({"location": location}).to_list()
     elif location == None and job_type == None:
-        jobs = await job_collection.find({"title": category}).to_list()
+        jobs = await job_collection.find({"category": category}).to_list()
     elif category == None:
         jobs = await job_collection.find({"job_type": job_type,"location": location}).to_list()
     elif job_type == None:
-        jobs = await job_collection.find({"location": location, "title": category}).to_list()
+        jobs = await job_collection.find({"location": location, "category": category}).to_list()
     elif location == None:
-        jobs = await job_collection.find({"job_type": job_type, "title": category}).to_list()
+        jobs = await job_collection.find({"job_type": job_type, "category": category}).to_list()
     else:
-        jobs = await job_collection.find({"job_type": job_type, "title": category, "location": location}).to_list()
+        jobs = await job_collection.find({"job_type": job_type, "category": category, "location": location}).to_list()
     if jobs:
         return jobs
     return None
@@ -76,6 +76,14 @@ async def apply_job(jobId: str, userId: str) -> bool:
     },
     "$inc":{
         "no_of_applicants": 1
+    }}
+    to_update_job = await get_job_by_id(jobId)
+    updated_job = await to_update_job.update(update_query)
+    return updated_job
+
+async def update_coin(jobId: str,new_value: str) -> bool:
+    update_query = {"$set":{
+        "coins": new_value
     }}
     to_update_job = await get_job_by_id(jobId)
     updated_job = await to_update_job.update(update_query)

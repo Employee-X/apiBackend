@@ -159,6 +159,8 @@ class Job(Document):
     applicants: Optional[Dict[PydanticObjectId,bool]] = {}
     no_of_applicants: Optional[int] = 0
     date_posted: Optional[str] = None
+    category: Optional[str] = None
+    coins: Optional[str] = None
 
     class Config:
         json_schema_extra = {
@@ -177,7 +179,9 @@ class Job(Document):
                 "status": "active",
                 "applicants": {"1234567890":False},
                 "no_of_applicants": "5",
-                "date_posted": "2002-05-05"
+                "date_posted": "2002-05-05",
+                "category": "IT",
+                "coins": "abskcedfj=",
             }
         }
 
