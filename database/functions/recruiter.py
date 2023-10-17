@@ -51,7 +51,6 @@ async def get_img(userId) -> (Union[str, None]):
 
 async def get_coins(userId) -> str:
     profile = await get_recruiter_profile_by_userId(userId)
-    return decrypt(profile.coins)
     return profile.coins
 
 async def update_coin(userId,value) -> str:
