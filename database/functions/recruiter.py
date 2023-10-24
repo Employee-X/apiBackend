@@ -60,3 +60,11 @@ async def update_coin(userId,value) -> str:
     to_update_profile = await get_recruiter_profile_by_userId(userId)
     updated_profile = await to_update_profile.update(update_query)
     return updated_profile
+
+async def update_free_job(userId,value) -> str:
+    update_query = {"$inc": {
+        "free_jobs": value
+    }}
+    to_update_profile = await get_recruiter_profile_by_userId(userId)
+    updated_profile = await to_update_profile.update(update_query)
+    return updated_profile

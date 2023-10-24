@@ -3,7 +3,7 @@ from pydantic import EmailStr
 from pydantic_extra_types.phone_numbers import PhoneNumber
 from beanie import PydanticObjectId
 from typing import Optional, List, Dict
-
+from business.policy import *
 from utils.utils import Roles,Gender,Profession,Skills
 
 
@@ -12,7 +12,7 @@ class User(Document):
     mobile: PhoneNumber
     password: str
     roles: Roles
-    email_verified: bool = False
+    email_verified: bool = True
     mobile_verified: bool = True
     otp: Optional[int] = 000000
     otp_expiration: Optional[str] = "2023-04-01T05:00:30.001000"
@@ -53,7 +53,7 @@ class Job_Seeker(Document):
     cv_url: Optional[str] = None
     verification_doc_url: Optional[str] = None
     cv_verified_status: bool = False
-    img_url: Optional[str] = None
+    img_url: Optional[str] = "https://employeex.s3.ap-south-1.amazonaws.com/Default+pics/Def_User.png"
 
     jobs_applied: List[PydanticObjectId] = []
 
@@ -119,9 +119,10 @@ class Recruiter(Document):
     phone_number: PhoneNumber
     linkedin: Optional[str] = None
     description: Optional[str] = None
-    img_url: Optional[str] = None
-    bgimg_url: Optional[str] = None
+    img_url: Optional[str] = "https://employeex.s3.ap-south-1.amazonaws.com/Default+pics/Def_Rec.png"
+    bgimg_url: Optional[str] = "https://employeex.s3.ap-south-1.amazonaws.com/Default+pics/CompanyBg.png"
     coins: Optional[str] = None
+    free_jobs: Optional[int] = NUMBER_OF_FREE_JOBS
 
     class Config:
         json_schema_extra = {
@@ -136,7 +137,8 @@ class Recruiter(Document):
                 "description": "I am a recruiter.",
                 "img_url":"https://aws.s3.com/abc123.jpg",
                 "bgimg_url":"https://aws.s3.com/abc123.jpg",
-                "coins":"absdjkfjd=dksd"
+                "coins":"absdjkfjd=dksd",
+                "free_jobs":"5"
             }
         }
 

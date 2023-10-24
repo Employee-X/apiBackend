@@ -73,12 +73,15 @@ async def add_job(decoded_token: (str,str) = Depends(token_listener),job: api_mo
     if job.company_name != company_name:
         raise HTTPException(status_code=403, detail="Company name does not match")
     logo = recruiter.img_url
+    free_jobs = recruiter.free_jobs
+    if free_jobs>0:
+        coins = await recruiter_db.get_coins(decoded_token[1])
+        new_coin_value = int(decrypt(coins)) + COINS_ON_NEW_JOB
+        coins = encrypt(str(new_coin_value))
+        _ = await recruiter_db.update_free_job(decoded_token[1],-1)
+        _ = await recruiter_db.update_coin(decoded_token[1],coins)
     dbJob = convertors.apiJobToDbJob(job, PydanticObjectId(decoded_token[1]),logo)
     _ = await job_db.add_job(dbJob)
-    coins = await recruiter_db.get_coins(decoded_token[1])
-    new_coin_value = int(decrypt(coins)) + COINS_ON_NEW_JOB
-    coins = encrypt(str(new_coin_value))
-    _ = await recruiter_db.update_coin(decoded_token[1],coins)
     return api_models.Success_Message_Response(
         message = "Job added successfully"
     )
@@ -122,13 +125,7 @@ async def delete_job(jobId,decoded_token: (str,str) = Depends(token_listener)):
     if not validated:
         raise HTTPException(status_code=403, detail=msg)
     # decreasing coins corresponding to that job on deleting job
-    job_profile = await job_db.get_job_by_id(jobId)
-    coins = await recruiter_db.get_coins(decoded_token[1])
-    new_coin_value = int(decrypt(coins)) - int(decrypt(job_profile.coins))
-    coins = encrypt(str(new_coin_value))
-    _ = await recruiter_db.update_coin(decoded_token[1],coins)
     _ = await job_db.delete_job(jobId)
-    
     return api_models.Success_Message_Response(
         message = "Job deleted successfully"
     )
