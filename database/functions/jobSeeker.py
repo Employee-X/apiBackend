@@ -86,3 +86,4 @@ async def update_applied_job_list(userId: str,removed_jobs: list) -> bool:
     if updated_profile:
         return True
     return False
+
