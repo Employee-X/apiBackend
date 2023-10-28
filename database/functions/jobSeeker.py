@@ -36,8 +36,8 @@ async def update_cv(cv_url,verification_url, userId) -> (DbUserModels.Job_Seeker
     return updated_profile, past_url, past_verification_url
 
 async def apply_job(jobId: str, userId: str):
-    update_query = {"$push": {
-        "jobs_applied": PydanticObjectId(jobId)
+    update_query = {"$set": {
+        f"jobs_applied.{PydanticObjectId(jobId)}":"applied",
     }}
     to_update_profile = await get_job_seeker_profile_by_userId(userId)
     updated_profile = await to_update_profile.update(update_query)
@@ -75,15 +75,10 @@ async def get_img(userId) -> (Union[str, None]):
     return profile.img_url
 
 # for deletion of job from list of jobseeker
-async def update_applied_job_list(userId: str,removed_jobs: list) -> bool:
-    update_query = {"$pull":{
-        "jobs_applied":{
-            "$in":removed_jobs
-        }
+async def update_job_rejection(jobId: str,userId: str) -> bool:
+    update_query = {"$set": {
+        f"jobs_applied.{PydanticObjectId(jobId)}":"rejected",
     }}
-    to_update_profile = await get_job_seeker_profile_by_userId(userId)
+    to_update_profile = await get_job_seeker_profile_by_userId(PydanticObjectId(userId))
     updated_profile = await to_update_profile.update(update_query)
-    if updated_profile:
-        return True
-    return False
-
+    return updated_profile

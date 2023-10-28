@@ -4,7 +4,7 @@ from pydantic_extra_types.phone_numbers import PhoneNumber
 from beanie import PydanticObjectId
 from typing import Optional, List, Dict
 from business.policy import *
-from utils.utils import Roles,Gender,Profession,Skills
+from utils.utils import Roles,Gender,Profession,Skills,Job_Status,Applicant_Status
 
 
 class User(Document):
@@ -55,7 +55,7 @@ class Job_Seeker(Document):
     cv_verified_status: bool = False
     img_url: Optional[str] = "https://employeex.s3.ap-south-1.amazonaws.com/Default+pics/Def_User.png"
 
-    jobs_applied: List[PydanticObjectId] = []
+    jobs_applied: Optional[Dict[PydanticObjectId,Applicant_Status]] = {}
 
     class Config:
         json_schema_extra = {
@@ -75,7 +75,7 @@ class Job_Seeker(Document):
                 "verification_doc_url": "https://aws.s3.com/abc123.pdf",
                 "cv_verified_status": False,
                 "img_url": "https://aws.s3.com/abc123.pdf",
-                "jobs_applied": ["1234567890"],
+                "jobs_applied": {"1234567890":"applied"},
             }
         }
     
@@ -157,7 +157,7 @@ class Job(Document):
     experience: Optional[str] = None
     skills: List[Skills] = []
     perks: Optional[str] = None
-    status: Optional[str] = None
+    status: Optional[Job_Status] = "active"
     applicants: Optional[Dict[PydanticObjectId,bool]] = {}
     no_of_applicants: Optional[int] = 0
     date_posted: Optional[str] = None

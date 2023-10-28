@@ -5,6 +5,7 @@ import database.functions.recruiter as recruiter_db
 from business.policy import *
 from datetime import date,timezone,datetime,timedelta
 from auth.aes_security import * 
+from utils.utils import Applicant_Status
 
 def apiUserToDbUser(user: apiModels.User_SignUp) -> DbUserModels.User:
     return DbUserModels.User(
@@ -160,7 +161,7 @@ def dbJobToApiJobWithId(job: DbUserModels.Job) -> apiModels.Job_with_id:
         category = job.category,
     )
 
-def dbJobToApiJobWithStatus(job: DbUserModels.Job, status: bool) -> apiModels.Job_with_status:
+def dbJobToApiJobWithStatus(job: DbUserModels.Job, status: Applicant_Status) -> apiModels.Job_with_status:
     return apiModels.Job_with_status(
         id=str(job.id),
         title= job.title,

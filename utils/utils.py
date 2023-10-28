@@ -12,6 +12,15 @@ class Gender(str, Enum):
     female = "female"
     other = "other"
 
+class Job_Status(str,Enum):
+    active = "active"
+    inactive = "inactive"
+
+class Applicant_Status(str,Enum):
+    unapplied = "unapplied"
+    applied = "applied"
+    rejected = "rejected"
+
 class Profession(str, Enum):
     student = "student"
     software_engineer = "software_engineer"
