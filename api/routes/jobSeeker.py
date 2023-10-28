@@ -136,12 +136,16 @@ async def get_jobs(decoded_token: (str,str) = Depends(token_listener)):
     if not validated:
         raise HTTPException(status_code=403, detail=msg)
     profile = await jobSeeker_db.get_job_seeker_profile_by_userId(decoded_token[1])
-    applied_job_ids = profile.jobs_applied
+    applied_job_ids = profile.jobs_applied.keys()
     jobs = await job_db.get_all_jobs()
     apiJobs = []
     for job in jobs:
-        status = job.id in applied_job_ids
-        apiJobs.append(convertors.dbJobToApiJobWithStatus(job,status))
+        application_status = 'unapplied'
+        if job.id in applied_job_ids:
+            application_status = profile.jobs_applied[job.id]
+        apiJobs.append(convertors.dbJobToApiJobWithStatus(job,application_status))
+        # # status = job.id in applied_job_ids
+        # apiJobs.append(convertors.dbJobToApiJobWithStatus(job,status))
     return api_models.Seeker_Job_List(
         jobs = apiJobs
     )
@@ -187,13 +191,15 @@ async def apply_job(jobId,decoded_token: (str,str) = Depends(token_listener)):
     if not validated:
         raise HTTPException(status_code=403, detail=msg)
     profile = await jobSeeker_db.get_job_seeker_profile_by_userId(decoded_token[1])
-    applied_job_ids = profile.jobs_applied
+    applied_job_ids = profile.jobs_applied.keys()
     objectID = PydanticObjectId(jobId)
     if objectID in applied_job_ids:
         raise HTTPException(status_code=403, detail="Already applied for this job")
     job = await job_db.get_job_by_id(jobId)
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
+    if job.status == "inactive":
+        raise HTTPException(status_code=404, detail="Inactive Job")
     res = await job_db.apply_job(jobId,decoded_token[1])
     res = await jobSeeker_db.apply_job(jobId,decoded_token[1])
     return api_models.Success_Message_Response(
@@ -207,17 +213,13 @@ async def get_applied_jobs(decoded_token: (str,str) = Depends(token_listener)):
     if not validated:
         raise HTTPException(status_code=403, detail=msg)
     profile = await jobSeeker_db.get_job_seeker_profile_by_userId(decoded_token[1])
-    applied_job_ids = profile.jobs_applied
+    applied_jobs = profile.jobs_applied.items()
     apiJobs = []
     removed_jobs = []
-    for job_id in applied_job_ids:
+    for job_id,status in applied_jobs:
         job = await job_db.get_job_by_id(str(job_id))
         if job:
-            apiJobs.append(convertors.dbJobToApiJobWithStatus(job,True))
-        else:
-            removed_jobs.append(job_id)
-    if len(removed_jobs)>0:
-        _ = await jobSeeker_db.update_applied_job_list(decoded_token[1],removed_jobs)
+            apiJobs.append(convertors.dbJobToApiJobWithStatus(job,status))
     return api_models.Seeker_Job_List(
         jobs = apiJobs
     )

@@ -3,7 +3,7 @@ from fastapi.security import HTTPBasicCredentials
 from pydantic import BaseModel, EmailStr, Field
 from pydantic_extra_types.phone_numbers import PhoneNumber
 from typing import Optional, List
-from utils.utils import Roles,Gender,Profession, Skills
+from utils.utils import Roles,Gender,Profession, Skills,Applicant_Status
 
 # User Auth Models
 class User_SignUp(BaseModel):
@@ -333,7 +333,7 @@ class Job_with_id(Job):
         }
 
 class Job_with_status(Job_with_id):
-    application_status: bool = False
+    application_status: Optional[Applicant_Status]  = None
 
     class Config:
         json_schema_extra = {
@@ -351,7 +351,7 @@ class Job_with_status(Job_with_id):
                 "perks": "Health Insurance, Free Food",
                 "status": "active",
                 "category": "IT",
-                "application_status": False,
+                "application_status": "unapplied",
                 "no_of_applicants": "5",
                 "date_posted": "2002-05-05"
             }
@@ -425,7 +425,7 @@ class Seeker_Job_List(BaseModel):
                         "category": "IT",
                         "no_of_applicants": "5",
                         "date_posted": "2002-05-05",
-                        "application_status": False,
+                        "application_status": "applied",
                     },
                     {
                         "id": "1234567890",
@@ -443,7 +443,7 @@ class Seeker_Job_List(BaseModel):
                         "category": "IT",
                         "no_of_applicants": "5",
                         "date_posted": "2002-05-05",
-                        "application_status": False,
+                        "application_status": "applied",
                     },
                 ]
             }

@@ -7,6 +7,6 @@ RUN pip install --upgrade -r requirements.txt
 
 EXPOSE 8080
 
+COPY ./ /client_max_body_size.conf  /.platform/nginx/conf.d/
 COPY ./ /app
-
 CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080"]

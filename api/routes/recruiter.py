@@ -95,7 +95,8 @@ async def get_my_jobs(decoded_token: (str,str) = Depends(token_listener)):
     jobs = await job_db.get_jobs_by_recruiter_id(decoded_token[1])
     apiJobs = []
     for job in jobs:
-        apiJobs.append(convertors.dbJobToApiJobWithId(job))
+        if job.status == "active":
+            apiJobs.append(convertors.dbJobToApiJobWithId(job))
     return api_models.Job_List(
         jobs = apiJobs
     )
@@ -198,7 +199,7 @@ async def remove_job_applicant(userId,jobId,decoded_token: (str,str) = Depends(t
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
     _ = await job_db.update_applicant_list(jobId,userId)
-    _ = await jobSeeker_db.update_applied_job_list(userId,[PydanticObjectId(jobId)])
+    _ = await jobSeeker_db.update_job_rejection(jobId,userId)
     return api_models.Success_Message_Response(
         message = "Applicant removed successfully"
     )

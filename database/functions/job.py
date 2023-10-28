@@ -62,13 +62,12 @@ async def update_job(new_job, job_id: str) -> DbUserModels.Job:
     return updated_job
 
 async def delete_job(job_id: str) -> bool:
+    update_query = {"$set":{
+        "status": "inactive"
+    }}
     job = await get_job_by_id(job_id)
-    if job:
-        result = await job.delete()
-        return True
-    else:
-        result = None
-        return False
+    updated_job = await job.update(update_query)
+    return update_job
 
 async def apply_job(jobId: str, userId: str) -> bool:
     update_query = {"$set": {
