@@ -144,8 +144,6 @@ async def get_jobs(decoded_token: (str,str) = Depends(token_listener)):
         if job.id in applied_job_ids:
             application_status = profile.jobs_applied[job.id]
         apiJobs.append(convertors.dbJobToApiJobWithStatus(job,application_status))
-        # # status = job.id in applied_job_ids
-        # apiJobs.append(convertors.dbJobToApiJobWithStatus(job,status))
     return api_models.Seeker_Job_List(
         jobs = apiJobs
     )
@@ -161,8 +159,10 @@ async def get_job(jobId,decoded_token: (str,str) = Depends(token_listener)):
     job = await job_db.get_job_by_id(jobId)
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
-    status = job.id in applied_job_ids
-    apiJob = convertors.dbJobToApiJobWithStatus(job,status)
+    application_status = 'unapplied'
+    if job.id in applied_job_ids:
+        application_status = profile.jobs_applied[job.id]
+    apiJob = convertors.dbJobToApiJobWithStatus(job,application_status)
     return apiJob
 
 # jobs by filtering
@@ -178,8 +178,10 @@ async def get_jobs_by_filter(decoded_token: (str,str) = Depends(token_listener),
         raise HTTPException(status_code = 404, detail="Jobs not found")
     apiJobs = []
     for job in jobs:
-        status = job.id in applied_job_ids
-        apiJobs.append(convertors.dbJobToApiJobWithStatus(job,status))
+        application_status = 'unapplied'
+        if job.id in applied_job_ids:
+            application_status = profile.jobs_applied[job.id]
+        apiJobs.append(convertors.dbJobToApiJobWithStatus(job,application_status))
     return api_models.Seeker_Job_List(
         jobs = apiJobs
     )
