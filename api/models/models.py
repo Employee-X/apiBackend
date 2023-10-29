@@ -2,7 +2,7 @@ from fastapi import File, UploadFile
 from fastapi.security import HTTPBasicCredentials
 from pydantic import BaseModel, EmailStr, Field
 from pydantic_extra_types.phone_numbers import PhoneNumber
-from typing import Optional, List
+from typing import Optional, List,Dict
 from utils.utils import Roles,Gender,Profession, Skills,Applicant_Status
 
 # User Auth Models
@@ -280,7 +280,7 @@ class Job(BaseModel):
     description: Optional[str] = None
     location: Optional[str] = None
     job_type: Optional[str] = None
-    salary: Optional[str] = None
+    salary: Optional[Dict[str,str]] = None
     experience: Optional[str] = None
     skills: List[Skills] = []
     perks: Optional[str] = None
@@ -296,7 +296,7 @@ class Job(BaseModel):
                 "description": "Software Engineer",
                 "location": "Delhi",
                 "job_type": "Full Time",
-                "salary": "10 LPA",
+                "salary": {"min":"10","max":"15","currency":"inr","type":"lpa"},
                 "experience": "2 years",
                 "skills": ["Python", "Java", "JavaScript"],
                 "perks": "Health Insurance, Free Food",
@@ -320,7 +320,7 @@ class Job_with_id(Job):
                 "description": "Software Engineer",
                 "location": "Delhi",
                 "job_type": "Full Time",
-                "salary": "10 LPA",
+                "salary": {"min":"10","max":"15","currency":"inr","type":"lpa"},
                 "experience": "2 years",
                 "skills": ["Python", "Java", "JavaScript"],
                 "perks": "Health Insurance, Free Food",
@@ -345,7 +345,7 @@ class Job_with_status(Job_with_id):
                 "description": "Software Engineer",
                 "location": "Delhi",
                 "job_type": "Full Time",
-                "salary": "10 LPA",
+                "salary": {"min":"10","max":"15","currency":"inr","type":"lpa"},
                 "experience": "2 years",
                 "skills": ["Python", "Java", "JavaScript"],
                 "perks": "Health Insurance, Free Food",
@@ -372,7 +372,7 @@ class Job_List(BaseModel):
                         "description": "Software Engineer",
                         "location": "Delhi",
                         "job_type": "Full Time",
-                        "salary": "10 LPA",
+                        "salary": {"min":"10","max":"15","currency":"inr","type":"lpa"},
                         "experience": "2 years",
                         "skills": ["Python", "Java", "JavaScript"],
                         "perks": "Health Insurance, Free Food",
@@ -389,7 +389,7 @@ class Job_List(BaseModel):
                         "description": "Software Engineer",
                         "location": "Delhi",
                         "job_type": "Full Time",
-                        "salary": "10 LPA",
+                        "salary": {"min":"10","max":"15","currency":"inr","type":"lpa"},
                         "experience": "2 years",
                         "skills": ["Python", "Java", "JavaScript"],
                         "perks": "Health Insurance, Free Food",
@@ -417,7 +417,7 @@ class Seeker_Job_List(BaseModel):
                         "description": "Software Engineer",
                         "location": "Delhi",
                         "job_type": "Full Time",
-                        "salary": "10 LPA",
+                        "salary": {"min":"10","max":"15","currency":"inr","type":"lpa"},
                         "experience": "2 years",
                         "skills": ["Python", "Java", "JavaScript"],
                         "perks": "Health Insurance, Free Food",
@@ -435,7 +435,7 @@ class Seeker_Job_List(BaseModel):
                         "description": "Software Engineer",
                         "location": "Delhi",
                         "job_type": "Full Time",
-                        "salary": "10 LPA",
+                        "salary": {"min":"10","max":"15","currency":"inr","type":"lpa"},
                         "experience": "2 years",
                         "skills": ["Python", "Java", "JavaScript"],
                         "perks": "Health Insurance, Free Food",

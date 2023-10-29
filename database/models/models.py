@@ -153,7 +153,7 @@ class Job(Document):
     description: Optional[str] = None
     location: Optional[str] = None
     job_type: Optional[str] = None
-    salary: Optional[str] = None
+    salary: Optional[Dict[str,str]] = None
     experience: Optional[str] = None
     skills: List[Skills] = []
     perks: Optional[str] = None
@@ -174,7 +174,7 @@ class Job(Document):
                 "description": "Software Engineer",
                 "location": "Delhi",
                 "job_type": "Full Time",
-                "salary": "10 LPA",
+                "salary": {"min":"10","max":"15","currency":"inr","type":"lpa"},
                 "experience": "2 years",
                 "skills": ["Python", "Java", "JavaScript"],
                 "perks": "Health Insurance, Free Food",
