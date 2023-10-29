@@ -111,7 +111,7 @@ async def update_job(jobId,decoded_token: (str,str) = Depends(token_listener),jo
     company_name = recruiter.company_name
     if job.company_name != company_name:
         raise HTTPException(status_code=403, detail="Company name does not match")
-    dbJob = convertors.apiJobToDbJob(job, PydanticObjectId(decoded_token[1]),job.logo,job.company_name)
+    dbJob = convertors.apiJobToDbJob(job, PydanticObjectId(decoded_token[1]),job.logo)
     print(dbJob)
     _ = await job_db.update_job(dbJob,jobId)
 
