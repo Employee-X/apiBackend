@@ -167,13 +167,13 @@ async def get_job(jobId,decoded_token: (str,str) = Depends(token_listener)):
 
 # jobs by filtering
 @router.get("/filteredJobs",response_model=api_models.Seeker_Job_List)
-async def get_jobs_by_filter(decoded_token: (str,str) = Depends(token_listener),location: str = None,job_type: str= None,category: str = None):
+async def get_jobs_by_filter(decoded_token: (str,str) = Depends(token_listener),location: str = None,job_type: str= None,category: str = None,job_role: str = None):
     validated, msg = await validate_user(decoded_token[1], None, None)
     if not validated:
         raise HTTPException(status_code=403, detail=msg)
     profile = await jobSeeker_db.get_job_seeker_profile_by_userId(decoded_token[1])
     applied_job_ids = profile.jobs_applied
-    jobs = await job_db.get_job_by_filter(category,location,job_type)
+    jobs = await job_db.get_job_by_filter(category,location,job_type,job_role)
     if not jobs:
         raise HTTPException(status_code = 404, detail="Jobs not found")
     apiJobs = []
