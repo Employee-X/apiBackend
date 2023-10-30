@@ -29,23 +29,20 @@ async def get_job_by_id(job_id: str) -> Union[DbUserModels.Job, None]:
         return job
     return None
 
-async def get_job_by_filter(category: Union[str,None],location: Union[str,None],job_type: Union[str,None]) -> Union[DbUserModels.Job,None]:
+async def get_job_by_filter(category: Union[str,None],location: Union[str,None],job_type: Union[str,None],job_role: Union[str,None]) -> Union[DbUserModels.Job,None]:
     if category == None and location==None and job_type==None:
         jobs = await job_collection.find().to_list()
-    elif category == None and location==None:
-        jobs = await job_collection.find({"job_type": job_type}).to_list()
-    elif category == None and job_type ==None:
-        jobs = await job_collection.find({"location": location}).to_list()
-    elif location == None and job_type == None:
-        jobs = await job_collection.find({"category": category}).to_list()
-    elif category == None:
-        jobs = await job_collection.find({"job_type": job_type,"location": location}).to_list()
-    elif job_type == None:
-        jobs = await job_collection.find({"location": location, "category": category}).to_list()
-    elif location == None:
-        jobs = await job_collection.find({"job_type": job_type, "category": category}).to_list()
-    else:
-        jobs = await job_collection.find({"job_type": job_type, "category": category, "location": location}).to_list()
+        return jobs
+    query = {}
+    if location is not None:
+        query["location"] = location
+    if job_type is not None: 
+        query["job_type"] = job_type
+    if category is not None:
+        query["category"] = category
+    if job_role is not None:
+        query["title"] = job_role
+    jobs = await job_collection.find(query).to_list()
     if jobs:
         return jobs
     return None
