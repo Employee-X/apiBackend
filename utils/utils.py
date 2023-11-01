@@ -2,6 +2,15 @@ from enum import Enum
 import uuid
 import math, random
 
+JOB_COUNT_CATEGORY_WISE     =  {"programmingJobs":0,
+                            "financeAndAccountingJobProfiles": 0, 
+                            "musicAndAudioJobProfiles": 0 , 
+                            "videoAndAnimationJobProfiles": 0,
+                            "digitalMarketingJobProfiles": 0, 
+                            "designJobProfiles":0, 
+                            "productAndMarketingJobProfiles":0,
+                            "healthAndPharmacyJobProfiles":0}
+
 class Roles(str, Enum):
     job_seeker = "job_seeker"
     college = "college"

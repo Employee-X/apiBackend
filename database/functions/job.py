@@ -1,7 +1,7 @@
 from typing import List, Union
 from beanie import PydanticObjectId
 import database.models.models as DbUserModels
-
+from utils.utils import JOB_COUNT_CATEGORY_WISE
 
 job_collection = DbUserModels.Job
 
@@ -9,6 +9,7 @@ job_collection = DbUserModels.Job
 
 async def add_job(new_job: DbUserModels.Job) -> DbUserModels.Job:
     job = await new_job.create()
+    JOB_COUNT_CATEGORY_WISE[new_job.category] += 1
     return job
 
 async def get_jobs_by_recruiter_id(recruiter_id: str) -> List[DbUserModels.Job]:
@@ -63,8 +64,10 @@ async def delete_job(job_id: str) -> bool:
         "status": "inactive"
     }}
     job = await get_job_by_id(job_id)
+    if JOB_COUNT_CATEGORY_WISE[job.category]>0:
+        JOB_COUNT_CATEGORY_WISE[job.category] -= 1
     updated_job = await job.update(update_query)
-    return update_job
+    return updated_job
 
 async def apply_job(jobId: str, userId: str) -> bool:
     update_query = {"$set": {
