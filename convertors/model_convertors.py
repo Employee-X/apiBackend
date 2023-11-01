@@ -137,7 +137,7 @@ def apiJobToDbJob(job: apiModels.Job, recruiterId: PydanticObjectId,logo_url: st
         perks= job.perks,
         status= job.status,
         no_of_applicants = 0,
-        date_posted = str(datetime.now(timezone(timedelta(hours=+5.5),'IST')).date()),
+        date_posted = str(datetime.now(timezone(timedelta(hours=+5.5),'IST')).date().strftime("%d-%m-%Y")),
         category =job.category,
         coins=encrypt(str(COINS_ON_NEW_JOB)),
     )
