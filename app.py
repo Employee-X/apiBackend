@@ -9,31 +9,23 @@ from api.routes.jobSeeker import router as JSRouter
 from api.routes.college import router as CLLGRouter
 from api.routes.recruiter import router as RECRouter
 from utils.utils import JOB_COUNT_CATEGORY_WISE
+import database.models.models as DbUserModels
+job_collection = DbUserModels.Job
 
 app = FastAPI()
 
 @app.on_event("startup")
 async def start_database():
     await initiate_database()
-
-def rate_limit(max_call: int, time_frame: int):
-    def decorator(func):
-        calls = []
-        @wraps(func)
-        async def wrapper(request: Request, *args, **kwargs):
-            now = time.time()
-            calls_in_time_frame = [call for call in calls if call >= now-time_frame]
-            if len(calls_in_time_frame) >= max_call:
-                raise HTTPException(status_code = status.HTTP_429_TOO_MANY_REQUESTS,detail="Rate limit exceeded.")
-            calls.append(now)
-            return await func(request,*args,**kwargs)
-        return wrapper
-    return decorator
+    jobs = await job_collection.find().to_list()
+    if jobs:
+        for job in jobs:
+            if job.category!=None and job.category in JOB_COUNT_CATEGORY_WISE.keys():
+                JOB_COUNT_CATEGORY_WISE[job.category]+=1
  
 
 @app.get("/", tags=["Root"])
-@rate_limit(max_call=5,time_frame=5)
-async def read_root(request: Request):
+async def read_root():
     return {"message": "Hello World"}
 
 @app.get("/getOpenings",tags=["Root"])
