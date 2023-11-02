@@ -17,9 +17,9 @@ class Roles(str, Enum):
     recruiter = "recruiter"
 
 class Gender(str, Enum):
-    male = "male"
-    female = "female"
-    other = "other"
+    male = "Male"
+    female = "Female"
+    other = "Other"
 
 class Job_Status(str,Enum):
     active = "active"

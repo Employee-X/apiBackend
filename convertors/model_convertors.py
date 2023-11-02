@@ -28,6 +28,7 @@ def apiJobSeekerProfileToDbJobSeekerProfile(profile: apiModels.Job_Seeker_Profil
         description = profile.description,
         profession = profile.profession,
         skills= profile.skills,
+        location=profile.location,
     )
 
 def dbJobSeekerProfileToApiJobSeekerProfileWithIdCv(profile: DbUserModels.Job_Seeker) -> apiModels.Job_Seeker_Profile_With_Id_CV:
@@ -44,6 +45,7 @@ def dbJobSeekerProfileToApiJobSeekerProfileWithIdCv(profile: DbUserModels.Job_Se
         description = profile.description,
         skills= profile.skills,
         cv_url= profile.cv_url,
+        location=profile.location,
         verification_doc_url= profile.verification_doc_url,
         cv_verified_status= profile.cv_verified_status,
         img_url = profile.img_url,
@@ -59,6 +61,7 @@ def dbJobseekerToApiRecruiterWithoutCV(profile: DbUserModels.Job_Seeker,visited:
         img_url = profile.img_url,
         description = profile.description,
         visited = visited,
+        location=profile.location,
     )
 
 
@@ -109,6 +112,7 @@ def dbJobSeekerProfileToApiJobSeekerProfile(profile: DbUserModels.Job_Seeker) ->
         description = profile.description,
         skills= profile.skills,
         img_url = profile.img_url,
+        location=profile.location,
     )
 
 def dbRecruiterProfileToApiRecruiterProfile(profile: DbUserModels.Recruiter) -> apiModels.Recruiter_Profile:

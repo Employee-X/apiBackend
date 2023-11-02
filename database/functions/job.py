@@ -31,7 +31,7 @@ async def get_job_by_id(job_id: str) -> Union[DbUserModels.Job, None]:
     return None
 
 async def get_job_by_filter(category: Union[str,None],location: Union[str,None],job_type: Union[str,None],job_role: Union[str,None]) -> Union[DbUserModels.Job,None]:
-    if category == None and location==None and job_type==None:
+    if category == None and location==None and job_type==None and job_role==None:
         jobs = await job_collection.find().to_list()
         return jobs
     query = {}
