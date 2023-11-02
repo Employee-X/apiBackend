@@ -82,6 +82,7 @@ class Job_Seeker_Profile(BaseModel):
     description: Optional[str] = Field(default=None)
     skills: List[Skills] = []
     img_url: Optional[str] = None
+    location: Optional[str] = None
 
     class Config:
         json_schema_extra = {
@@ -89,14 +90,15 @@ class Job_Seeker_Profile(BaseModel):
                 "fullname": "Loren Ipsum  Dolor",
                 "college": "University of Virginia",
                 "email": "abc123@gmail.com",
-                "gender": "male",
+                "gender": "Male",
                 "phone_number": "+918888887777",
                 "date_of_birth": "2002-05-05",
                 "profession": ["student"],
                 "about": "I am a student",
                 "description": "I am a student",
                 "skills": ["Python", "Java", "JavaScript"],
-                "img_url": "https://aws.s3.com/abc123.pdf"
+                "img_url": "https://aws.s3.com/abc123.pdf",
+                "location": "Lucknow",
             }
         }
 
@@ -114,7 +116,7 @@ class Job_Seeker_Profile_With_Id_CV(Job_Seeker_Profile):
                 "fullname": "Loren Ipsum  Dolor",
                 "college": "University of Virginia",
                 "email": "abc123@gmail.com",
-                "gender": "male",
+                "gender": "Male",
                 "phone_number": "+918888887777",
                 "date_of_birth": "2002-05-05",
                 "profession": ["student"],
@@ -125,6 +127,7 @@ class Job_Seeker_Profile_With_Id_CV(Job_Seeker_Profile):
                 "verification_doc_url": "https://aws.s3.com/abc123.pdf",
                 "cv_verified_status": False,
                 "img_url": "https://aws.s3.com/abc123.pdf",
+                "loaction": "Lucknow",
             }
         }
 
@@ -137,6 +140,7 @@ class Job_Seeker_Profile_Without_CV(BaseModel):
     img_url: Optional[str]
     description: Optional[str]
     visited: Optional[bool]
+    location: Optional[str]
 
     class Config:
         json_schema_extra = {
@@ -144,11 +148,12 @@ class Job_Seeker_Profile_Without_CV(BaseModel):
                 "id": "1234567890",
                 "fullname": "Loren Ipsum  Dolor",
                 "college": "University of Virginia", 
-                "gender": "male",
+                "gender": "Male",
                 "skills": ["Python", "Java", "JavaScript"],
                 "img_url": "https://aws.s3.com/abc123.pdf",
                 "description": "I am a student",
                 "visited": "false",
+                "location": "Lucknow"
             }
         }
 
@@ -165,19 +170,23 @@ class Seeker_List(BaseModel):
                         "id": "1234567890",
                         "fullname": "Loren Ipsum  Dolor",
                         "college": "University of Virginia", 
-                        "gender": "male",
+                        "gender": "Male",
                         "skills": ["Python", "Java", "JavaScript"],
                         "img_url": "https://aws.s3.com/abc123.pdf",
                         "description": "I am a student",
+                        "location": "Lucknow",
+                        "visited": "false",
                     },
                     {
                         "id": "1234567890",
                         "fullname": "Loren Ipsum  Dolor",
                         "college": "University of Virginia", 
-                        "gender": "male",
+                        "gender": "Male",
                         "skills": ["Python", "Java", "JavaScript"],
                         "img_url": "https://aws.s3.com/abc123.pdf",
                         "description": "I am a student",
+                        "location": "Lucknow",
+                        "visited": "false"
                     },
                 ]
             }

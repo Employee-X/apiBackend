@@ -1,7 +1,4 @@
-from fastapi import FastAPI,HTTPException, Request,status
-from functools import wraps
-import time
-
+from fastapi import FastAPI,Request
 from config.config import initiate_database
 
 from api.routes.user import router as UserRouter
@@ -22,11 +19,14 @@ async def start_database():
         for job in jobs:
             if job.category!=None and job.category in JOB_COUNT_CATEGORY_WISE.keys():
                 JOB_COUNT_CATEGORY_WISE[job.category]+=1
+
  
 
 @app.get("/", tags=["Root"])
-async def read_root():
-    return {"message": "Hello World"}
+async def read_root(request: Request):
+    return {"message": "Hello World",
+            "client": request.client.host
+            }
 
 @app.get("/getOpenings",tags=["Root"])
 async def get_openings():

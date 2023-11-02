@@ -40,7 +40,6 @@ class Job_Seeker(Document):
 
     email: EmailStr
     phone_number: PhoneNumber
-
     fullname: Optional[str] = None
     college: Optional[str] = None
     gender: Optional[Gender] = None
@@ -49,7 +48,7 @@ class Job_Seeker(Document):
     about: Optional[str] = None
     description: Optional[str] = None
     skills: List[Skills] = []
-
+    location: Optional[str] = None
     cv_url: Optional[str] = None
     verification_doc_url: Optional[str] = None
     cv_verified_status: bool = False
@@ -64,12 +63,13 @@ class Job_Seeker(Document):
                 "fullname": "Loren Ipsum  Dolor",
                 "college": "University of Virginia",
                 "email": "abc123@gmail.com",
-                "gender": "male",
+                "gender": "Male",
                 "phone_number": "+918888887777",
                 "date_of_birth": "2002-05-05",
                 "profession": ["student"],
                 "about": "I am a student",
                 "description": "I am a student",
+                "location": "Lucknow",
                 "skills": ["Python", "Django", "Flask"],
                 "cv_url": "https://aws.s3.com/abc123.pdf",
                 "verification_doc_url": "https://aws.s3.com/abc123.pdf",
