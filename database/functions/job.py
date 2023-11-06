@@ -97,12 +97,16 @@ async def mark_visited_applicant(jobId: str,userId: str) -> bool:
     return updated_job
 
 async def update_applicant_list(jobId: str,userId: str) -> bool:
+    to_update_job = await get_job_by_id(jobId)
+    applicants = to_update_job.no_of_applicants
+    incr = -1
+    if applicants==0:
+        incr = 0
     update_query = {"$unset":{
         f"applicants.{PydanticObjectId(userId)}":""
     },
     "$inc": {
-        "no_of_applicants": -1
+        "no_of_applicants": incr
     }}
-    to_update_job = await get_job_by_id(jobId)
     updated_job = await to_update_job.update(update_query)
     return updated_job

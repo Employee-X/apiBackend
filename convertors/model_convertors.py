@@ -62,6 +62,7 @@ def dbJobseekerToApiRecruiterWithoutCV(profile: DbUserModels.Job_Seeker,visited:
         description = profile.description,
         visited = visited,
         location=profile.location,
+        date_of_birth=profile.date_of_birth,
     )
 
 

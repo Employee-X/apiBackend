@@ -141,6 +141,7 @@ class Job_Seeker_Profile_Without_CV(BaseModel):
     description: Optional[str]
     visited: Optional[bool]
     location: Optional[str]
+    date_of_birth: Optional[str]
 
     class Config:
         json_schema_extra = {
@@ -153,7 +154,8 @@ class Job_Seeker_Profile_Without_CV(BaseModel):
                 "img_url": "https://aws.s3.com/abc123.pdf",
                 "description": "I am a student",
                 "visited": "false",
-                "location": "Lucknow"
+                "location": "Lucknow",
+                "date_of_birth": "2002-05-05",
             }
         }
 
@@ -176,6 +178,7 @@ class Seeker_List(BaseModel):
                         "description": "I am a student",
                         "location": "Lucknow",
                         "visited": "false",
+                        "date_of_birth": "2002-05-05",
                     },
                     {
                         "id": "1234567890",
@@ -186,7 +189,8 @@ class Seeker_List(BaseModel):
                         "img_url": "https://aws.s3.com/abc123.pdf",
                         "description": "I am a student",
                         "location": "Lucknow",
-                        "visited": "false"
+                        "visited": "false",
+                        "date_of_birth": "2002-05-05",
                     },
                 ]
             }
