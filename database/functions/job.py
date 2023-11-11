@@ -30,7 +30,7 @@ async def get_job_by_id(job_id: str) -> Union[DbUserModels.Job, None]:
         return job
     return None
 
-async def get_job_by_filter(category: Union[str,None],location: Union[str,None],job_type: Union[str,None],job_role: Union[str,None]) -> Union[DbUserModels.Job,None]:
+async def get_job_by_filter(category: Union[str,None],location: Union[str,None],job_type: Union[str,None],job_role: Union[str,None]) -> List[DbUserModels.Job]:
     if category == None and location==None and job_type==None and job_role==None:
         jobs = await job_collection.find().to_list()
         return jobs
@@ -46,7 +46,7 @@ async def get_job_by_filter(category: Union[str,None],location: Union[str,None],
     jobs = await job_collection.find(query).to_list()
     if jobs:
         return jobs
-    return None
+    return []
 
 
 async def update_job(new_job, job_id: str) -> DbUserModels.Job:
@@ -64,7 +64,7 @@ async def delete_job(job_id: str) -> bool:
         "status": "inactive"
     }}
     job = await get_job_by_id(job_id)
-    if JOB_COUNT_CATEGORY_WISE[job.category]>0:
+    if job.category in JOB_COUNT_CATEGORY_WISE and JOB_COUNT_CATEGORY_WISE[job.category]>0:
         JOB_COUNT_CATEGORY_WISE[job.category] -= 1
     updated_job = await job.update(update_query)
     return updated_job
@@ -108,5 +108,13 @@ async def update_applicant_list(jobId: str,userId: str) -> bool:
     "$inc": {
         "no_of_applicants": incr
     }}
+    updated_job = await to_update_job.update(update_query)
+    return updated_job
+
+async def update_job_approval(jobId,status):
+    update_query = {"$set":{
+        "job_approval_status": status
+    }}
+    to_update_job = await get_job_by_id(jobId)
     updated_job = await to_update_job.update(update_query)
     return updated_job

@@ -3,7 +3,7 @@ from fastapi.security import HTTPBasicCredentials
 from pydantic import BaseModel, EmailStr, Field
 from pydantic_extra_types.phone_numbers import PhoneNumber
 from typing import Optional, List,Dict
-from utils.utils import Roles,Gender,Profession, Skills,Applicant_Status
+from utils.utils import Roles,Gender,Profession, Skills,Applicant_Status,Recruiter_Status,Job_Approval_Status
 
 # User Auth Models
 class User_SignUp(BaseModel):
@@ -370,6 +370,8 @@ class Job_with_status(Job_with_id):
             }
         }
 
+
+
 class Job_List(BaseModel):
     jobs: List[Job_with_id]
 
@@ -457,6 +459,134 @@ class Seeker_Job_List(BaseModel):
                         "no_of_applicants": "5",
                         "date_posted": "2002-05-05",
                         "application_status": "applied",
+                    },
+                ]
+            }
+        }
+
+class Recruiter_with_approval_status(BaseModel):
+    id: str
+    recruiter_name: Optional[str] = None
+    company_name: Optional[str] = None
+    email: EmailStr
+    phone_number: PhoneNumber
+    date_of_signup: Optional[str] = None
+    approval_status: Optional[Recruiter_Status] = None
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "id": "fdfdfjds2131",
+                "recruiter_name": "Loren Ipsum  Dolor",
+                "company_name": "employeeX",
+                "email": "abc123@gmail.com",
+                "phone_number": "+918888887777",
+                "date_of_signup": "05-05-2020",
+                "approval_status":"awaiting",
+            }
+        }
+
+class Recriters_with_approval_status_list(BaseModel):
+    recruiters: List[Recruiter_with_approval_status]
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "recruiters":[
+                    {
+                        "id": "fdfdfjds2131",
+                        "recruiter_name": "Loren Ipsum  Dolor",
+                        "company_name": "employeeX",
+                        "email": "abc123@gmail.com",
+                        "phone_number": "+918888887777",
+                        "date_of_signup": "05-05-2020",
+                        "approval_status":"awaiting",
+                    },
+                    {
+                        "id": "fdfdfjds2131",
+                        "recruiter_name": "Loren Ipsum  Dolor",
+                        "company_name": "employeeX",
+                        "email": "abc123@gmail.com",
+                        "phone_number": "+918888887777",
+                        "date_of_signup": "05-05-2020",
+                        "approval_status":"awaiting",
+                    },
+                ]
+            }
+        }
+
+class Job_with_approval_status(BaseModel):
+    id: str 
+    title: Optional[str] = None
+    company_name: Optional[str] = None
+    logo: Optional[str] = None
+    description: Optional[str] = None
+    location: Optional[str] = None
+    job_type: Optional[str] = None
+    salary: Optional[Dict[str,str]] = None
+    experience: Optional[str] = None
+    skills: List[Skills] = []
+    perks: Optional[str] = None
+    status: Optional[str] = None
+    category: Optional[str] = None
+    job_approval_status: Optional[Job_Approval_Status] = None
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "id": "1234567890",
+                "title": "Software Engineer",
+                "company_name": "employeeX",
+                "logo": "https://aws.s3.com/abc123.pdf",
+                "description": "Software Engineer",
+                "location": "Delhi",
+                "job_type": "Full Time",
+                "salary": {"min":"10","max":"15","currency":"inr","type":"lpa"},
+                "experience": "2 years",
+                "skills": ["Python", "Java", "JavaScript"],
+                "perks": "Health Insurance, Free Food",
+                "status": "active",
+                "category": "others",
+                "job_approval_status": "unhold",
+            }
+        }
+
+class Job_with_approval_status_list(BaseModel):
+    jobs: List[Job_with_approval_status]
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "jobs":[
+                    {
+                        "id": "1234567890",
+                        "title": "Software Engineer",
+                        "company_name": "employeeX",
+                        "logo": "https://aws.s3.com/abc123.pdf",
+                        "description": "Software Engineer",
+                        "location": "Delhi",
+                        "job_type": "Full Time",
+                        "salary": {"min":"10","max":"15","currency":"inr","type":"lpa"},
+                        "experience": "2 years",
+                        "skills": ["Python", "Java", "JavaScript"],
+                        "perks": "Health Insurance, Free Food",
+                        "status": "active",
+                        "category": "others",
+                        "job_approval_status": "unhold",
+                    },
+                    {
+                        "id": "1234567890",
+                        "title": "Software Engineer",
+                        "company_name": "employeeX",
+                        "logo": "https://aws.s3.com/abc123.pdf",
+                        "description": "Software Engineer",
+                        "location": "Delhi",
+                        "job_type": "Full Time",
+                        "salary": {"min":"10","max":"15","currency":"inr","type":"lpa"},
+                        "experience": "2 years",
+                        "skills": ["Python", "Java", "JavaScript"],
+                        "perks": "Health Insurance, Free Food",
+                        "status": "active",
+                        "category": "others",
+                        "job_approval_status": "unhold",
                     },
                 ]
             }

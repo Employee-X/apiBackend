@@ -140,6 +140,8 @@ async def get_jobs(decoded_token: (str,str) = Depends(token_listener)):
     jobs = await job_db.get_all_jobs()
     apiJobs = []
     for job in jobs:
+        if job.job_approval_status == "hold":
+            continue
         application_status = 'unapplied'
         if job.id in applied_job_ids:
             application_status = profile.jobs_applied[job.id]
@@ -178,6 +180,8 @@ async def get_jobs_by_filter(decoded_token: (str,str) = Depends(token_listener),
         raise HTTPException(status_code = 404, detail="Jobs not found")
     apiJobs = []
     for job in jobs:
+        if job.job_approval_status == 'hold':
+            continue
         application_status = 'unapplied'
         if job.id in applied_job_ids:
             application_status = profile.jobs_applied[job.id]

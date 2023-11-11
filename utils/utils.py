@@ -17,6 +17,8 @@ class Roles(str, Enum):
     job_seeker = "job_seeker"
     college = "college"
     recruiter = "recruiter"
+    admin = "admin"
+
 
 class Gender(str, Enum):
     male = "Male"
@@ -31,6 +33,15 @@ class Applicant_Status(str,Enum):
     unapplied = "unapplied"
     applied = "applied"
     rejected = "rejected"
+
+class Recruiter_Status(str,Enum):
+    allowed = "allowed"
+    awaiting = "awaiting"
+    denied = "denied"
+
+class Job_Approval_Status(str,Enum):
+    hold = "hold"
+    unhold = "unhold"
 
 class Profession(str, Enum):
     student = "student"
