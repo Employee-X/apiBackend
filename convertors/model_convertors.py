@@ -5,7 +5,7 @@ import database.functions.recruiter as recruiter_db
 from business.policy import *
 from datetime import date,timezone,datetime,timedelta
 from auth.aes_security import * 
-from utils.utils import Applicant_Status
+from utils.utils import Applicant_Status,Job_Approval_Status
 
 def apiUserToDbUser(user: apiModels.User_SignUp) -> DbUserModels.User:
     return DbUserModels.User(
@@ -126,7 +126,7 @@ def dbRecruiterProfileToApiRecruiterProfile(profile: DbUserModels.Recruiter) -> 
         description=profile.description,
     )
 
-def apiJobToDbJob(job: apiModels.Job, recruiterId: PydanticObjectId,logo_url: str) -> DbUserModels.Job:
+def apiJobToDbJob(job: apiModels.Job, recruiterId: PydanticObjectId,logo_url: str,job_approval_status: Job_Approval_Status) -> DbUserModels.Job:
     return DbUserModels.Job(
         recruiterId = recruiterId,
         company_name= job.company_name,
@@ -141,9 +141,9 @@ def apiJobToDbJob(job: apiModels.Job, recruiterId: PydanticObjectId,logo_url: st
         perks= job.perks,
         status= job.status,
         no_of_applicants = 0,
-        date_posted = str(datetime.now(timezone(timedelta(hours=+5.5),'IST')).date().strftime("%d-%m-%Y")),
         category =job.category,
         coins=encrypt(str(COINS_ON_NEW_JOB)),
+        job_approval_status=job_approval_status,
     )
 
 def dbJobToApiJobWithId(job: DbUserModels.Job) -> apiModels.Job_with_id:
@@ -183,4 +183,33 @@ def dbJobToApiJobWithStatus(job: DbUserModels.Job, status: Applicant_Status) -> 
         no_of_applicants = job.no_of_applicants,
         date_posted = job.date_posted,
         category = job.category,
+    )
+
+def dbRecruiterToApiAdmin(recruiter: DbUserModels.Recruiter) -> apiModels.Recruiter_with_approval_status:
+    return apiModels.Recruiter_with_approval_status(
+        id=str(recruiter.userId),
+        recruiter_name=recruiter.your_name,
+        email=recruiter.email,
+        phone_number=recruiter.phone_number,
+        date_of_signup=recruiter.date_of_signup,
+        company_name=recruiter.company_name,
+        approval_status=recruiter.approval_status,
+    )
+
+def dbJobToApiAdminJob(job: DbUserModels.Job) -> apiModels.Job_with_approval_status:
+    return apiModels.Job_with_approval_status(
+        id=str(job.id),
+        title=job.title,
+        company_name=job.company_name,
+        logo=job.logo,
+        description=job.description,
+        location=job.location,
+        job_type=job.job_type,
+        salary=job.salary,
+        experience=job.experience,
+        skills=job.skills,
+        perks=job.perks,
+        status=job.status,
+        category=job.category,
+        job_approval_status = job.job_approval_status,
     )

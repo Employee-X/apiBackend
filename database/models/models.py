@@ -4,7 +4,8 @@ from pydantic_extra_types.phone_numbers import PhoneNumber
 from beanie import PydanticObjectId
 from typing import Optional, List, Dict
 from business.policy import *
-from utils.utils import Roles,Gender,Profession,Skills,Job_Status,Applicant_Status
+from utils.utils import Roles,Gender,Profession,Skills,Job_Status,Applicant_Status,Recruiter_Status,Job_Approval_Status
+from datetime import date,timezone,datetime,timedelta
 
 
 class User(Document):
@@ -123,6 +124,8 @@ class Recruiter(Document):
     bgimg_url: Optional[str] = "https://employeex.s3.ap-south-1.amazonaws.com/Default+pics/CompanyBg.png"
     coins: Optional[str] = None
     free_jobs: Optional[int] = NUMBER_OF_FREE_JOBS
+    approval_status: Optional[Recruiter_Status] = "awaiting"
+    date_of_signup: Optional[str] = str(datetime.now(timezone(timedelta(hours=+5.5),'IST')).date().strftime("%d-%m-%Y"))
 
     class Config:
         json_schema_extra = {
@@ -138,7 +141,9 @@ class Recruiter(Document):
                 "img_url":"https://aws.s3.com/abc123.jpg",
                 "bgimg_url":"https://aws.s3.com/abc123.jpg",
                 "coins":"absdjkfjd=dksd",
-                "free_jobs":"5"
+                "free_jobs":"5",
+                "approval_status":"awaiting",
+                "date_of_signup":"05-05-2020",
             }
         }
 
@@ -160,9 +165,10 @@ class Job(Document):
     status: Optional[Job_Status] = "active"
     applicants: Optional[Dict[PydanticObjectId,bool]] = {}
     no_of_applicants: Optional[int] = 0
-    date_posted: Optional[str] = None
+    date_posted: Optional[str] = str(datetime.now(timezone(timedelta(hours=+5.5),'IST')).date().strftime("%d-%m-%Y"))
     category: Optional[str] = None
     coins: Optional[str] = None
+    job_approval_status: Optional[Job_Approval_Status] = "unhold"
 
     class Config:
         json_schema_extra = {
@@ -181,11 +187,52 @@ class Job(Document):
                 "status": "active",
                 "applicants": {"1234567890":False},
                 "no_of_applicants": "5",
-                "date_posted": "2002-05-05",
+                "date_posted": "05-05-2020",
                 "category": "IT",
                 "coins": "abskcedfj=",
+                "job_approval_status":"unhold",
             }
         }
 
     class Settings:
         name = "jobs"
+
+
+class Admin(Document):
+    adminId: PydanticObjectId
+    email: EmailStr
+    phone_number: PhoneNumber
+    no_of_job_seekers: Optional[int] = 0
+    last_day_start_time: Optional[datetime] = None
+    last_day_signup: Optional[int] = 0
+    last_day_login: Optional[int] = 0
+    last_month_start: Optional[datetime] = None
+    last_month_signup: Optional[int] = 0
+    last_month_login: Optional[int] = 0
+    jobs_posted: Optional[int] = 0
+    active_jobs: Optional[int] = 0
+    inactive_jobs: Optional[int] = 0
+    active_users: Optional[int] = 0
+
+    class Config:
+        json_schema_extra = {
+            "example":{
+                "userId": "1234567890",
+                "email": "abc123@gmail.com",
+                "phone_number": "+918888887777",
+                'no_of_job_seekers': 5 ,
+                'last_day_start_time': '2017-05-16 08:21:10',
+                'last_day_signup': 0,
+                'last_day_login': 0,
+                'last_month_start': '2017-05-16 08:21:10',
+                'last_month_signup': 0,
+                'last_month_login': 0,
+                'jobs_posted' : 0,
+                'active_jobs': 0,
+                'inactive_jobs': 0,
+                'active_users': 0,
+            }
+        }
+
+    class Settings:
+        name = "admin"

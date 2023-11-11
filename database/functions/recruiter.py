@@ -68,3 +68,11 @@ async def update_free_job(userId,value) -> str:
     to_update_profile = await get_recruiter_profile_by_userId(userId)
     updated_profile = await to_update_profile.update(update_query)
     return updated_profile
+
+async def update_approval_status(userId,status) -> str:
+    update_query = {"$set":{
+        "approval_status": status
+    }}
+    to_update_profile = await get_recruiter_profile_by_userId(userId)
+    updated_profile = await to_update_profile.update(update_query)
+    return updated_profile

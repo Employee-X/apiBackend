@@ -72,6 +72,8 @@ async def user_signup(user: api_models.User_SignUp = Body(...)):
         new_user = await user_db.add_user(dbUser)
         db_profile = convertors.apiCollegeProfileToDbCollegeProfile(new_profile, new_user.id)
         new_profile = await college_db.add_college(db_profile)
+    elif dbUser.roles == "admin":
+        new_user = await user_db.add_user(dbUser)
     else:
         raise HTTPException(status_code=403, detail="Invalid user roles")
     # return user created successfully

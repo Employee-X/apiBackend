@@ -80,7 +80,13 @@ async def add_job(decoded_token: (str,str) = Depends(token_listener),job: api_mo
         coins = encrypt(str(new_coin_value))
         _ = await recruiter_db.update_free_job(decoded_token[1],-1)
         _ = await recruiter_db.update_coin(decoded_token[1],coins)
-    dbJob = convertors.apiJobToDbJob(job, PydanticObjectId(decoded_token[1]),logo)
+    job_approval_status = "hold"
+    if recruiter.approval_status == "allowed":
+        job_approval_status = "unhold"
+    dbJob = convertors.apiJobToDbJob(job, PydanticObjectId(decoded_token[1]),logo,job_approval_status)
+    job_approval_status = "hold"
+    if recruiter.approval_status == "allowed":
+        job_approval_status = "unhold"
     _ = await job_db.add_job(dbJob)
     return api_models.Success_Message_Response(
         message = "Job added successfully"
