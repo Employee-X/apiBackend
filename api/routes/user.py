@@ -7,10 +7,11 @@ import database.functions.user as user_db
 import database.functions.jobSeeker as job_seeker_db
 import database.functions.recruiter as recruiter_db
 import database.functions.college as college_db
+import database.functions.admin as admin_db
 
 import convertors.model_convertors as convertors
 import api.models.models as api_models
-
+import database.models.models as db_models
 
 router = APIRouter()
 
@@ -25,6 +26,7 @@ async def user_login(user_credentials: api_models.User_SignIn = Body(...)):
         password = hash_helper.verify(user_credentials.password, user_exists.password)
         if password:
             token = sign_jwt(str(user_exists.id))
+            _ = await admin_db.incr_login()
             return api_models.User_SignIn_Response(
                 access_token = token,
                 roles = user_exists.roles,
@@ -74,11 +76,14 @@ async def user_signup(user: api_models.User_SignUp = Body(...)):
         new_profile = await college_db.add_college(db_profile)
     elif dbUser.roles == "admin":
         new_user = await user_db.add_user(dbUser)
+        db_profile = db_models.Admin(adminId=new_user.id)
+        new_profile = await admin_db.add_admin(db_profile)
     else:
         raise HTTPException(status_code=403, detail="Invalid user roles")
     # return user created successfully
     user_exists = await user_db.get_user_by_email(user.email)
     token = sign_jwt(str(user_exists.id))
+    _ = await admin_db.incr_signup()
     return api_models.User_SignIn_Response(
         access_token = token,
         roles = user_exists.roles,

@@ -197,40 +197,49 @@ class Job(Document):
     class Settings:
         name = "jobs"
 
-
 class Admin(Document):
-    adminId: PydanticObjectId
-    email: EmailStr
-    phone_number: PhoneNumber
-    no_of_job_seekers: Optional[int] = 0
-    last_day_start_time: Optional[datetime] = None
-    last_day_signup: Optional[int] = 0
-    last_day_login: Optional[int] = 0
-    last_month_start: Optional[datetime] = None
-    last_month_signup: Optional[int] = 0
-    last_month_login: Optional[int] = 0
-    jobs_posted: Optional[int] = 0
+    adminId: PydanticObjectId 
+    day_logins: Optional[int] = 0
+    day_new_users: Optional[int] = 0
+    week_logins: Optional[int] = 0
+    week_new_users: Optional[int] = 0
+    month_logins: Optional[int] = 0
+    month_new_users: Optional[int] = 0
+    jobs: Optional[int] = 0
     active_jobs: Optional[int] = 0
     inactive_jobs: Optional[int] = 0
-    active_users: Optional[int] = 0
+    last_day_logins: Optional[int] = 0
+    last_day_new_users: Optional[int] = 0
+    last_week_logins: Optional[int] = 0
+    last_week_new_users: Optional[int] = 0
+    last_month_logins: Optional[int] = 0
+    last_month_new_users: Optional[int] = 0
+    day_end_epoch: Optional[int] = (datetime.now()+timedelta(days=1)).strftime('%s')
+    week_end_epoch: Optional[int] = (datetime.now()+timedelta(days=7)).strftime('%s')
+    month_end_epoch: Optional[int] = (datetime.now()+timedelta(days=30)).strftime('%s')
 
     class Config:
         json_schema_extra = {
-            "example":{
-                "userId": "1234567890",
-                "email": "abc123@gmail.com",
-                "phone_number": "+918888887777",
-                'no_of_job_seekers': 5 ,
-                'last_day_start_time': '2017-05-16 08:21:10',
-                'last_day_signup': 0,
-                'last_day_login': 0,
-                'last_month_start': '2017-05-16 08:21:10',
-                'last_month_signup': 0,
-                'last_month_login': 0,
-                'jobs_posted' : 0,
-                'active_jobs': 0,
-                'inactive_jobs': 0,
-                'active_users': 0,
+            "example": {
+                "adminId": "1234567890",
+                "day_logins": 0,
+                "day_new_users": 0,
+                "week_logins": 0,
+                "week_new_users": 0,
+                "month_logins": 0,
+                "month_new_users": 0,
+                "jobs": 0,
+                "active_jobs": 0,
+                "inactive_jobs": 0,
+                "last_day_logins": 0,
+                "last_day_new_users": 0,
+                "last_week_logins": 0,
+                "last_week_new_users": 0,
+                "last_month_logins": 0,
+                "last_month_new_users": 0,
+                "day_end_epoch": 0,
+                "week_end_epoch": 0,
+                "month_end_epoch": 0,
             }
         }
 
