@@ -213,3 +213,16 @@ def dbJobToApiAdminJob(job: DbUserModels.Job) -> apiModels.Job_with_approval_sta
         category=job.category,
         job_approval_status = job.job_approval_status,
     )
+
+def dbAdminToApiAdmin(admin: DbUserModels.Admin) -> apiModels.admin_log:
+    return apiModels.admin_log(
+        day_logins=admin.last_day_logins,
+        day_new_users=admin.last_day_new_users,
+        week_logins=admin.last_week_logins,
+        week_new_users=admin.last_week_new_users,
+        month_logins=admin.last_month_logins,
+        month_new_users=admin.last_month_new_users,
+        jobs=admin.jobs,
+        active_jobs=admin.active_jobs,
+        inactive_jobs=admin.inactive_jobs,
+    )

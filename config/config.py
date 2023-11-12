@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     secret_key: str = "secret"
     algorithm: str = "HS256"
     AES_KEY: str = "AES128"
+    ADMIN_ID: str = "adminid"
 
     # AWS S3 Configuration
     AWS_ACCESS_KEY_ID: Optional[str] = None

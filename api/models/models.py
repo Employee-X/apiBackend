@@ -587,3 +587,29 @@ class Job_with_approval_status_list(BaseModel):
                 ]
             }
         }
+
+class admin_log(BaseModel):
+    day_logins: int = 0
+    day_new_users: int = 0
+    week_logins: int = 0
+    week_new_users: int = 0
+    month_logins: int = 0
+    month_new_users: int = 0
+    jobs: int = 0
+    active_jobs: int = 0
+    inactive_jobs: int = 0
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "day_logins": 0,
+                "day_new_users": 0,
+                "week_logins": 0,
+                "week_new_users": 0,
+                "month_logins": 0,
+                "month_new_users": 0,
+                "jobs": 0,
+                "active_jobs": 0,
+                "inactive_jobs": 0
+            }
+        }

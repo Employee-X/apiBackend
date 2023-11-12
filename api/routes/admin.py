@@ -84,3 +84,13 @@ async def approveJob(status: Job_Approval_Status,jobId: str,decoded_token: (str,
     return apiModels.Success_Message_Response(
         message="Approval Status Changed to {}".format(status)
     )
+
+@router.get("/user_stat",response_model=apiModels.admin_log)
+async def user_stat(decoded_token: (str,str) = Depends(token_listener)) -> apiModels.admin_log:
+    validated, msg = await validate_admin(decoded_token[1],None,None)
+    if not validated:
+        raise HTTPException(status_code=403,detail=msg)
+    admin = await admin_db.get_admin_profile_by_adminId(decoded_token[1])
+    if not admin:
+        raise HTTPException(status_code=404,detail="Admin not found")
+    return convertors.dbAdminToApiAdmin(admin)
