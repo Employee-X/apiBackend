@@ -79,7 +79,7 @@ async def incr_signup() -> bool:
     updated_admin = await admin.update(update_query)
     return updated_admin
 
-async def incr_job(adminId: str) -> bool:
+async def incr_job() -> bool:
     update_query = {"$inc":{
         "jobs":1,
         "active_jobs":1,
