@@ -26,7 +26,7 @@ async def user_login(user_credentials: api_models.User_SignIn = Body(...)):
         password = hash_helper.verify(user_credentials.password, user_exists.password)
         if password:
             token = sign_jwt(str(user_exists.id))
-            _ = await admin_db.incr_login()
+            # _ = await admin_db.incr_login()
             return api_models.User_SignIn_Response(
                 access_token = token,
                 roles = user_exists.roles,
@@ -83,7 +83,7 @@ async def user_signup(user: api_models.User_SignUp = Body(...)):
     # return user created successfully
     user_exists = await user_db.get_user_by_email(user.email)
     token = sign_jwt(str(user_exists.id))
-    _ = await admin_db.incr_signup()
+    # _ = await admin_db.incr_signup()
     return api_models.User_SignIn_Response(
         access_token = token,
         roles = user_exists.roles,
