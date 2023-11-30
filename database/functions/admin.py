@@ -79,21 +79,36 @@ async def incr_signup() -> bool:
     updated_admin = await admin.update(update_query)
     return updated_admin
 
-async def incr_job() -> bool:
+async def incr_job(amount=0) -> bool:
+    if amount==0:
+        amount = 1
     update_query = {"$inc":{
-        "jobs":1,
-        "active_jobs":1,
+        "jobs":amount,
+        "active_jobs":amount,
     }}
     admin = await get_admin_profile_by_adminId(adminId)
     updated_admin = await admin.update(update_query)
     return updated_admin
 
 async def decr_jobs() -> bool:
-    update_query = {"$inc":{
-        "active_jobs":-1,
-        "inactive_jobs":1,
-    }}
     admin = await get_admin_profile_by_adminId(adminId)
+    incr = 0
+    if admin.active_jobs>0:
+        incr = 1
+    update_query = {"$inc":{
+        "active_jobs":-incr,
+        "inactive_jobs":incr,
+    }}
+    updated_admin = await admin.update(update_query)
+    return updated_admin
+
+async def start_admin(active_jobs,inactive_jobs):
+    admin = await get_admin_profile_by_adminId(adminId) 
+    update_query = {"$set":{
+        "active_jobs": active_jobs,
+        "inactive_jobs": inactive_jobs,
+        "jobs": active_jobs + inactive_jobs,
+    }}
     updated_admin = await admin.update(update_query)
     return updated_admin
 

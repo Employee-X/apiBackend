@@ -188,8 +188,8 @@ class Job(Document):
                 "applicants": {"1234567890":False},
                 "no_of_applicants": "5",
                 "date_posted": "05-05-2020",
-                "category": "IT",
-                "coins": "abskcedfj=",
+                "category": "others",
+                "coins": "WpEvpO05dTtSIOcU0vXojA==",
                 "job_approval_status":"unhold",
             }
         }

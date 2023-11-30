@@ -9,7 +9,7 @@ import database.functions.user as user_db
 import database.functions.jobSeeker as jobSeeker_db
 import database.functions.recruiter as recruiter_db
 import database.functions.job as job_db
-# import database.functions.admin as admin_db
+import database.functions.admin as admin_db
 import convertors.model_convertors as convertors
 import api.models.models as api_models
 from auth.jwt_bearer import JWTBearer
@@ -89,7 +89,7 @@ async def add_job(decoded_token: (str,str) = Depends(token_listener),job: api_mo
     if recruiter.approval_status == "allowed":
         job_approval_status = "unhold"
     _ = await job_db.add_job(dbJob)
-    # _ = await admin_db.incr_job()
+    _ = await admin_db.incr_job()
     return api_models.Success_Message_Response(
         message = "Job added successfully"
     )
@@ -135,7 +135,7 @@ async def delete_job(jobId,decoded_token: (str,str) = Depends(token_listener)):
         raise HTTPException(status_code=403, detail=msg)
     # decreasing coins corresponding to that job on deleting job
     _ = await job_db.delete_job(jobId)
-    # _ = await admin_db.decr_jobs()
+    _ = await admin_db.decr_jobs()
     return api_models.Success_Message_Response(
         message = "Job deleted successfully"
     )

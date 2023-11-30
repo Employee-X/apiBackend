@@ -10,6 +10,9 @@ from api.routes.recruiter import router as RECRouter
 from api.routes.admin import router as ADMRouter
 from utils.utils import JOB_COUNT_CATEGORY_WISE
 import database.models.models as DbUserModels
+import database.functions.job as job_db
+from beanie import PydanticObjectId
+import database.functions.admin as admin_db
 job_collection = DbUserModels.Job
 recruiter_collection = DbUserModels.Recruiter
 
@@ -35,10 +38,18 @@ app.add_middleware(
 async def start_database():
     await initiate_database()
     jobs = await job_collection.find().to_list()
+    active_jobs = 0
+    inactive_jobs = 0
     if jobs:
         for job in jobs:
             if job.category!=None and job.category in JOB_COUNT_CATEGORY_WISE.keys():
                 JOB_COUNT_CATEGORY_WISE[job.category]+=1
+            if job.status == "active":
+                active_jobs+=1
+            elif job.status == "inactive":
+                inactive_jobs+=1
+    _ = await admin_db.start_admin(active_jobs,inactive_jobs)
+
  
 
 @app.get("/", tags=["Root"])
