@@ -169,6 +169,7 @@ class Job(Document):
     category: Optional[str] = None
     coins: Optional[str] = None
     job_approval_status: Optional[Job_Approval_Status] = "unhold"
+    no_of_openings: Optional[int] = None
 
     class Config:
         json_schema_extra = {
@@ -191,6 +192,7 @@ class Job(Document):
                 "category": "others",
                 "coins": "WpEvpO05dTtSIOcU0vXojA==",
                 "job_approval_status":"unhold",
+                "no_of_opening": "2",
             }
         }
 

@@ -145,6 +145,7 @@ def apiJobToDbJob(job: apiModels.Job, recruiterId: PydanticObjectId,logo_url: st
         category =job.category,
         coins=encrypt(str(COINS_ON_NEW_JOB)),
         job_approval_status=job_approval_status,
+        no_of_openings=job.no_of_openings,
     )
 
 def dbJobToApiJobWithId(job: DbUserModels.Job) -> apiModels.Job_with_id:
@@ -164,6 +165,7 @@ def dbJobToApiJobWithId(job: DbUserModels.Job) -> apiModels.Job_with_id:
         no_of_applicants = job.no_of_applicants,
         date_posted = job.date_posted,
         category = job.category,
+        no_of_openings=job.no_of_openings,
     )
 
 def dbJobToApiJobWithStatus(job: DbUserModels.Job, status: Applicant_Status) -> apiModels.Job_with_status:
@@ -184,6 +186,7 @@ def dbJobToApiJobWithStatus(job: DbUserModels.Job, status: Applicant_Status) -> 
         no_of_applicants = job.no_of_applicants,
         date_posted = job.date_posted,
         category = job.category,
+        no_of_openings=job.no_of_openings,
     )
 
 def dbRecruiterToApiAdmin(recruiter: DbUserModels.Recruiter) -> apiModels.Recruiter_with_approval_status:
@@ -213,6 +216,7 @@ def dbJobToApiAdminJob(job: DbUserModels.Job) -> apiModels.Job_with_approval_sta
         status=job.status,
         category=job.category,
         job_approval_status = job.job_approval_status,
+        no_of_openings=job.no_of_openings,
     )
 
 def dbAdminToApiAdmin(admin: DbUserModels.Admin) -> apiModels.admin_log:

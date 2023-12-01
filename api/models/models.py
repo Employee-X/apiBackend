@@ -299,6 +299,7 @@ class Job(BaseModel):
     perks: Optional[str] = None
     status: Optional[str] = None
     category: Optional[str] = None
+    no_of_openings: Optional[int] = None
 
     class Config:
         json_schema_extra = {
@@ -315,6 +316,7 @@ class Job(BaseModel):
                 "perks": "Health Insurance, Free Food",
                 "status": "active",
                 "category": "IT",
+                "no_of_openings": "2",
             }
         }
 
@@ -339,6 +341,7 @@ class Job_with_id(Job):
                 "perks": "Health Insurance, Free Food",
                 "status": "active",
                 "category": "IT",
+                "no_of_openings": "2",
                 "no_of_applicants": "5",
                 "date_posted": "2002-05-05"
                 
@@ -364,6 +367,7 @@ class Job_with_status(Job_with_id):
                 "perks": "Health Insurance, Free Food",
                 "status": "active",
                 "category": "IT",
+                "no_of_openings": "2",
                 "application_status": "unapplied",
                 "no_of_applicants": "5",
                 "date_posted": "2002-05-05"
@@ -393,6 +397,7 @@ class Job_List(BaseModel):
                         "perks": "Health Insurance, Free Food",
                         "status": "active",
                         "category": "IT",
+                        "no_of_openings": "2",
                         "no_of_applicants": "5",
                         "date_posted": "2002-05-05"
                     },
@@ -410,6 +415,7 @@ class Job_List(BaseModel):
                         "perks": "Health Insurance, Free Food",
                         "status": "active",
                         "category": "IT",
+                        "no_of_openings": "2",
                         "no_of_applicants": "5",
                         "date_posted": "2002-05-05"
                     },
@@ -438,6 +444,7 @@ class Seeker_Job_List(BaseModel):
                         "perks": "Health Insurance, Free Food",
                         "status": "active",
                         "category": "IT",
+                        "no_of_openings": "2",
                         "no_of_applicants": "5",
                         "date_posted": "2002-05-05",
                         "application_status": "applied",
@@ -456,6 +463,7 @@ class Seeker_Job_List(BaseModel):
                         "perks": "Health Insurance, Free Food",
                         "status": "active",
                         "category": "IT",
+                        "no_of_openings": "2",
                         "no_of_applicants": "5",
                         "date_posted": "2002-05-05",
                         "application_status": "applied",
@@ -528,6 +536,7 @@ class Job_with_approval_status(BaseModel):
     perks: Optional[str] = None
     status: Optional[str] = None
     category: Optional[str] = None
+    no_of_openings: Optional[int] = None
     job_approval_status: Optional[Job_Approval_Status] = None
 
     class Config:
@@ -546,6 +555,7 @@ class Job_with_approval_status(BaseModel):
                 "perks": "Health Insurance, Free Food",
                 "status": "active",
                 "category": "others",
+                "no_of_openings": "2",
                 "job_approval_status": "unhold",
             }
         }
@@ -570,6 +580,7 @@ class Job_with_approval_status_list(BaseModel):
                         "perks": "Health Insurance, Free Food",
                         "status": "active",
                         "category": "others",
+                        "no_of_openings": "2",
                         "job_approval_status": "unhold",
                     },
                     {
@@ -586,6 +597,7 @@ class Job_with_approval_status_list(BaseModel):
                         "perks": "Health Insurance, Free Food",
                         "status": "active",
                         "category": "others",
+                        "no_of_openings": "2",
                         "job_approval_status": "unhold",
                     },
                 ]
