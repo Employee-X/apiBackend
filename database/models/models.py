@@ -4,7 +4,7 @@ from pydantic_extra_types.phone_numbers import PhoneNumber
 from beanie import PydanticObjectId
 from typing import Optional, List, Dict
 from business.policy import *
-from utils.utils import Roles,Gender,Profession,Skills,Job_Status,Applicant_Status,Recruiter_Status,Job_Approval_Status
+from utils.utils import Roles,Gender,Profession,Job_Status,Applicant_Status,Recruiter_Status,Job_Approval_Status
 from datetime import date,timezone,datetime,timedelta
 
 
@@ -48,7 +48,7 @@ class Job_Seeker(Document):
     profession: List[Profession] = []
     about: Optional[str] = None
     description: Optional[str] = None
-    skills: List[Skills] = []
+    skills: List[str] = []
     location: Optional[str] = None
     cv_url: Optional[str] = None
     verification_doc_url: Optional[str] = None
@@ -160,7 +160,7 @@ class Job(Document):
     job_type: Optional[str] = None
     salary: Optional[Dict[str,str]] = None
     experience: Optional[str] = None
-    skills: List[Skills] = []
+    skills: List[str] = []
     perks: Optional[str] = None
     status: Optional[Job_Status] = "active"
     applicants: Optional[Dict[PydanticObjectId,bool]] = {}

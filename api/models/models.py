@@ -3,7 +3,7 @@ from fastapi.security import HTTPBasicCredentials
 from pydantic import BaseModel, EmailStr, Field
 from pydantic_extra_types.phone_numbers import PhoneNumber
 from typing import Optional, List,Dict
-from utils.utils import Roles,Gender,Profession, Skills,Applicant_Status,Recruiter_Status,Job_Approval_Status
+from utils.utils import Roles,Gender,Profession,Applicant_Status,Recruiter_Status,Job_Approval_Status
 
 # User Auth Models
 class User_SignUp(BaseModel):
@@ -80,7 +80,7 @@ class Job_Seeker_Profile(BaseModel):
     profession: List[Profession] = []
     about: Optional[str] = Field(default=None)
     description: Optional[str] = Field(default=None)
-    skills: List[Skills] = []
+    skills: List[str] = []
     img_url: Optional[str] = None
     location: Optional[str] = None
 
@@ -136,7 +136,7 @@ class Job_Seeker_Profile_Without_CV(BaseModel):
     fullname: str
     college: Optional[str]
     gender: Optional[str]
-    skills: List[Skills] = []
+    skills: List[str] = []
     img_url: Optional[str]
     description: Optional[str]
     visited: Optional[bool]
@@ -295,7 +295,7 @@ class Job(BaseModel):
     job_type: Optional[str] = None
     salary: Optional[Dict[str,str]] = None
     experience: Optional[str] = None
-    skills: List[Skills] = []
+    skills: List[str] = []
     perks: Optional[str] = None
     status: Optional[str] = None
     category: Optional[str] = None
@@ -532,7 +532,7 @@ class Job_with_approval_status(BaseModel):
     job_type: Optional[str] = None
     salary: Optional[Dict[str,str]] = None
     experience: Optional[str] = None
-    skills: List[Skills] = []
+    skills: List[str] = []
     perks: Optional[str] = None
     status: Optional[str] = None
     category: Optional[str] = None
