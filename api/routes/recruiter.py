@@ -2,6 +2,7 @@ from typing import Optional
 from fastapi import Body, APIRouter, HTTPException, Depends, UploadFile, File, logger
 from passlib.context import CryptContext
 from beanie import PydanticObjectId
+from datetime import datetime,timedelta
 
 from auth.jwt_handler import sign_jwt
 
@@ -155,6 +156,41 @@ async def get_job_applicants(jobId,decoded_token: (str,str) = Depends(token_list
     for applicant_id,visited in applicants:
         applicant = await jobSeeker_db.get_job_seeker_profile_by_userId(str(applicant_id))
         apiApplicants.append(convertors.dbJobseekerToApiRecruiterWithoutCV(applicant,visited))
+    return api_models.Seeker_List(
+        applicants=apiApplicants
+    )
+
+# job applicants filter
+@router.get("/filterApplicants/{jobId}",response_model=api_models.Seeker_List)
+async def filter_applicants(jobId,age_min: int = None,age_max: int = None,location: str = None,gender: str = None,decoded_token: (str,str) = Depends(token_listener)):
+    validated, msg = await validate_user(decoded_token[1], None, None)
+    if not validated:
+        raise HTTPException(status_code=403, detail=msg)
+
+    job = await job_db.get_job_by_id(jobId)
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    applicants = job.applicants.items()
+    apiApplicants = []
+    for applicant_id,visited in applicants:
+        applicant = await jobSeeker_db.get_job_seeker_profile_by_userId(str(applicant_id))
+        api_applicant = convertors.dbJobseekerToApiRecruiterWithoutCV(applicant,visited)
+        _gender = api_applicant.gender
+        _location = api_applicant.location
+        _dob = datetime.strptime(api_applicant.date_of_birth,"%Y-%m-%d")
+        _today = datetime.now()
+        _age  = _today.year - _dob.year
+        if _today.month < _dob.month or (_today.month==_dob.month and _today.day < _dob.date):
+            _age -= 1
+        if(age_min!=None and _age<age_min):
+            continue
+        if (age_max!=None and age_max<_age):
+            continue
+        if(location!=None and location!=_location):
+            continue
+        if(gender!=None and gender!=_gender):
+            continue
+        apiApplicants.append(api_applicant)
     return api_models.Seeker_List(
         applicants=apiApplicants
     )
