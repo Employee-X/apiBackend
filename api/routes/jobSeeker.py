@@ -116,7 +116,7 @@ async def getCV(decoded_token: (str,str) = Depends(token_listener)):
     validated, msg = await validate_user(decoded_token[1], None, None)
     if not validated:
         raise HTTPException(status_code=403, detail=msg)
-    cv_url, verif_url, verif_status,cv_uplaoded = await jobSeeker_db.get_cv(decoded_token[1])
+    cv_url, verif_url, verif_status,cv_uploaded = await jobSeeker_db.get_cv(decoded_token[1])
     if not cv_url:
         cv_url = None
     if not verif_url:
@@ -126,7 +126,7 @@ async def getCV(decoded_token: (str,str) = Depends(token_listener)):
         cv_url = cv_url,
         verif_doc_url = verif_url,
         cv_verif_status=verif_status,
-        cv_uploaded=cv_uplaoded,
+        cv_uploaded=cv_uploaded,
     )
 
 # get all jobs

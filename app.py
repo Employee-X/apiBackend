@@ -15,6 +15,7 @@ from beanie import PydanticObjectId
 import database.functions.admin as admin_db
 job_collection = DbUserModels.Job
 recruiter_collection = DbUserModels.Recruiter
+job_seeker_collection = DbUserModels.Job_Seeker
 
 app = FastAPI()
 
@@ -49,6 +50,8 @@ async def start_database():
             elif job.status == "inactive":
                 inactive_jobs+=1
     _ = await admin_db.start_admin(active_jobs,inactive_jobs)
+    # await update()
+    
 
  
 
@@ -69,3 +72,16 @@ app.include_router(JSRouter, tags=["JobSeeker"], prefix="/jobseeker")
 app.include_router(CLLGRouter, tags=["College"], prefix="/college")
 app.include_router(RECRouter, tags=["Recruiter"], prefix="/recruiter")
 app.include_router(ADMRouter, tags=["Admin"], prefix="/admin")
+
+
+# async def update():
+#     job_seekers = await job_seeker_collection.find().to_list()
+#     for job_seeker in job_seekers:
+#         # if not job_seeker.cv_uploaded:
+#         cv_uploaded = False
+#         if job_seeker.cv_url!=None:
+#             cv_uploaded = True
+#         update_query = {"$set":{
+#             "cv_uploaded": cv_uploaded
+#         }}
+#         _ = await job_seeker.update(update_query)

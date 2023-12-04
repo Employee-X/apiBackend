@@ -19,8 +19,6 @@ from config.config import s3_client
 from auth.aes_security import *
 from business.policy import *
 
-
-
 token_listener = JWTBearer()
 
 router = APIRouter()

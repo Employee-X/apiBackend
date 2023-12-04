@@ -274,10 +274,10 @@ class Recruiter_Profile(BaseModel):
         }
 
 class CV_Response(BaseModel):
-    cv_url: str
-    verif_doc_url: str
-    cv_verif_status: bool = False
-    cv_uploaded: bool = False
+    cv_url: Optional[str] = None
+    verif_doc_url: Optional[str] = None
+    cv_verif_status: Optional[bool] = False
+    cv_uploaded: Optional[bool] = False
     class Config:
         json_schema_extra = {
             "example": {
@@ -289,8 +289,8 @@ class CV_Response(BaseModel):
         }
 
 class IMG_Response(BaseModel):
-    img_url: str
-    bgimg_url: str
+    img_url: Optional[str] = None
+    bgimg_url: Optional[str] = None
     class Config:
         json_schema_extra = {
             "example": {
@@ -300,7 +300,7 @@ class IMG_Response(BaseModel):
         }
 
 class Coin(BaseModel):
-    coins: str
+    coins: Optional[str] = None
     class Config:
         json_schema_extra={
             "example":{
@@ -309,7 +309,7 @@ class Coin(BaseModel):
         }
 
 class Success_Message_Response(BaseModel):
-    message: str
+    message: Optional[str]  = None
 
     class Config:
         josn_schema_extra = {
