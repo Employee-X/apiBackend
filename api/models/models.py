@@ -83,6 +83,7 @@ class Job_Seeker_Profile(BaseModel):
     skills: List[str] = []
     img_url: Optional[str] = None
     location: Optional[str] = None
+    
 
     class Config:
         json_schema_extra = {
@@ -102,12 +103,36 @@ class Job_Seeker_Profile(BaseModel):
             }
         }
 
+class Job_Seeker_Get_Profile(Job_Seeker_Profile):
+    cv_uploaded: Optional[bool] = False
+    
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "fullname": "Loren Ipsum  Dolor",
+                "college": "University of Virginia",
+                "email": "abc123@gmail.com",
+                "gender": "Male",
+                "phone_number": "+918888887777",
+                "date_of_birth": "2002-05-05",
+                "profession": ["student"],
+                "about": "I am a student",
+                "description": "I am a student",
+                "skills": ["Python", "Java", "JavaScript"],
+                "img_url": "https://aws.s3.com/abc123.pdf",
+                "location": "Lucknow",
+                "cv_uploaded": "False",
+            }
+        }
+
 class Job_Seeker_Profile_With_Id_CV(Job_Seeker_Profile):
     id: str
     cv_url: Optional[str] = Field(default=None)
     verification_doc_url: Optional[str] = Field(default=None)
     cv_verified_status: bool = False
     img_url: Optional[str] = None
+    cv_uploaded: Optional[bool] = False
 
     class Config:
         json_schema_extra = {
@@ -128,6 +153,7 @@ class Job_Seeker_Profile_With_Id_CV(Job_Seeker_Profile):
                 "cv_verified_status": False,
                 "img_url": "https://aws.s3.com/abc123.pdf",
                 "loaction": "Lucknow",
+                'cv_uploaded': "False",
             }
         }
 
@@ -142,6 +168,7 @@ class Job_Seeker_Profile_Without_CV(BaseModel):
     visited: Optional[bool]
     location: Optional[str]
     date_of_birth: Optional[str]
+    cv_uploaded: Optional[bool]
 
     class Config:
         json_schema_extra = {
@@ -153,9 +180,10 @@ class Job_Seeker_Profile_Without_CV(BaseModel):
                 "skills": ["Python", "Java", "JavaScript"],
                 "img_url": "https://aws.s3.com/abc123.pdf",
                 "description": "I am a student",
-                "visited": "false",
+                "visited": "False",
                 "location": "Lucknow",
                 "date_of_birth": "2002-05-05",
+                "cv_uploaded": "False",
             }
         }
 
@@ -179,6 +207,7 @@ class Seeker_List(BaseModel):
                         "location": "Lucknow",
                         "visited": "false",
                         "date_of_birth": "2002-05-05",
+                        "cv_uploaded": "False",
                     },
                     {
                         "id": "1234567890",
@@ -191,6 +220,7 @@ class Seeker_List(BaseModel):
                         "location": "Lucknow",
                         "visited": "false",
                         "date_of_birth": "2002-05-05",
+                        "cv_uploaded": "False",
                     },
                 ]
             }
@@ -247,12 +277,14 @@ class CV_Response(BaseModel):
     cv_url: str
     verif_doc_url: str
     cv_verif_status: bool = False
+    cv_uploaded: bool = False
     class Config:
         json_schema_extra = {
             "example": {
                 "cv_url": "https://aws.s3.com/abc123.pdf",
                 "verif_doc_url": "https://aws.s3.com/abc123.pdf",
                 "cv_verif_status": False,
+                "cv_uploaded": False,
             }
         }
 

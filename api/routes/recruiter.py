@@ -71,9 +71,6 @@ async def add_job(decoded_token: (str,str) = Depends(token_listener),job: api_mo
     if not validated:
         raise HTTPException(status_code=403, detail=msg)
     recruiter = await recruiter_db.get_recruiter_profile_by_userId(decoded_token[1])
-    company_name = recruiter.company_name
-    if job.company_name != company_name:
-        raise HTTPException(status_code=403, detail="Company name does not match")
     logo = recruiter.img_url
     free_jobs = recruiter.free_jobs
     if free_jobs>0:

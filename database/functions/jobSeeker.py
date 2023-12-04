@@ -28,6 +28,7 @@ async def update_cv(cv_url,verification_url, userId) -> (DbUserModels.Job_Seeker
         "cv_url": cv_url,
         "verification_doc_url": verification_url,
         "cv_verified_status": False,
+        "cv_uploaded": True,
     }}
     to_update_profile = await get_job_seeker_profile_by_userId(userId)
     past_url = to_update_profile.cv_url
@@ -45,7 +46,7 @@ async def apply_job(jobId: str, userId: str):
 
 async def get_cv(userId) -> (Union[str, None], Union[str, None], bool):
     profile = await get_job_seeker_profile_by_userId(userId)
-    return profile.cv_url, profile.verification_doc_url, profile.cv_verified_status
+    return profile.cv_url, profile.verification_doc_url, profile.cv_verified_status,profile.cv_uploaded
 
 async def get_job_seeker_profile_by_userId(userId: str) -> Union[DbUserModels.Job_Seeker, None]:
     job_seeker = await job_seeker_collection.find_one({"userId": PydanticObjectId(userId)})

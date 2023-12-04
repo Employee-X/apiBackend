@@ -61,7 +61,7 @@ async def update_profile(decoded_token: (str,str) = Depends(token_listener),job_
     )
     
 # get profile
-@router.get("/profile", response_model=api_models.Job_Seeker_Profile)
+@router.get("/profile", response_model=api_models.Job_Seeker_Get_Profile)
 async def get_profile(decoded_token: (str,str) = Depends(token_listener)):
     validated, msg = await validate_user(decoded_token[1], None, None)
     if not validated:
@@ -69,7 +69,6 @@ async def get_profile(decoded_token: (str,str) = Depends(token_listener)):
 
     profile = await jobSeeker_db.get_job_seeker_profile_by_userId(decoded_token[1])
     apiProfile = convertors.dbJobSeekerProfileToApiJobSeekerProfile(profile)
-
     return apiProfile
 
 # update CV
@@ -84,7 +83,7 @@ async def updateCV(decoded_token: (str,str) = Depends(token_listener),cvobject: 
     uploads3 = await s3_client.upload_fileobj(filename=new_filename, fileobject=data)
     if uploads3:
         s3_url = f"https://{s3_client.bucket}.s3.{s3_client.region}.amazonaws.com/{s3_client.key}{new_filename}"
-        _,s3_url2,__ = await jobSeeker_db.get_cv(decoded_token[1])
+        _,s3_url2,__,__ = await jobSeeker_db.get_cv(decoded_token[1])
         _, past_cv, past_verif_doc = await jobSeeker_db.update_cv(s3_url,s3_url2,decoded_token[1])
         if past_cv:
             status = await s3_client.delete_fileobj(past_cv.split('/')[-1])
@@ -117,9 +116,9 @@ async def getCV(decoded_token: (str,str) = Depends(token_listener)):
     validated, msg = await validate_user(decoded_token[1], None, None)
     if not validated:
         raise HTTPException(status_code=403, detail=msg)
-    cv_url, verif_url, verif_status = await jobSeeker_db.get_cv(decoded_token[1])
+    cv_url, verif_url, verif_status,cv_uplaoded = await jobSeeker_db.get_cv(decoded_token[1])
     if not cv_url:
-        raise HTTPException(status_code=404, detail="CV not found")
+        cv_url = None
     if not verif_url:
         verif_url = ""
         # raise HTTPException(status_code=404, detail="Verification document not found")
@@ -127,6 +126,7 @@ async def getCV(decoded_token: (str,str) = Depends(token_listener)):
         cv_url = cv_url,
         verif_doc_url = verif_url,
         cv_verif_status=verif_status,
+        cv_uploaded=cv_uplaoded,
     )
 
 # get all jobs

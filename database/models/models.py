@@ -52,6 +52,7 @@ class Job_Seeker(Document):
     location: Optional[str] = None
     cv_url: Optional[str] = None
     verification_doc_url: Optional[str] = None
+    cv_uploaded: Optional[bool] = False
     cv_verified_status: bool = False
     img_url: Optional[str] = "https://employeex.s3.ap-south-1.amazonaws.com/Default+pics/Def_User.png"
 
@@ -74,6 +75,7 @@ class Job_Seeker(Document):
                 "skills": ["Python", "Django", "Flask"],
                 "cv_url": "https://aws.s3.com/abc123.pdf",
                 "verification_doc_url": "https://aws.s3.com/abc123.pdf",
+                "cv_uploaded": False,
                 "cv_verified_status": False,
                 "img_url": "https://aws.s3.com/abc123.pdf",
                 "jobs_applied": {"1234567890":"applied"},

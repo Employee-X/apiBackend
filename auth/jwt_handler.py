@@ -8,7 +8,7 @@ secret_key = Settings().secret_key
 
 def sign_jwt(user_id: str) -> str:
     # Set the expiry time.
-    payload = {"user_id": user_id, "expires": time.time() + 2400}
+    payload = {"user_id": user_id, "expires": time.time() + 864000}
     return jwt.encode(payload, secret_key, algorithm="HS256")
 
 
