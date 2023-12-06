@@ -17,6 +17,7 @@ class User(Document):
     mobile_verified: bool = True
     otp: Optional[int] = 000000
     otp_expiration: Optional[str] = "2023-04-01T05:00:30.001000"
+    referral: Optional[str] = None
 
     class Config:
         json_schema_extra = {
@@ -29,6 +30,7 @@ class User(Document):
                 "mobile_verified": False,
                 "otp": 000000,
                 "expiration": "2021-05-05 12:00:00",
+                "referral": "fdjfkjflfj"
             }
         }
 
@@ -128,6 +130,7 @@ class Recruiter(Document):
     free_jobs: Optional[int] = NUMBER_OF_FREE_JOBS
     approval_status: Optional[Recruiter_Status] = "awaiting"
     date_of_signup: Optional[str] = str(datetime.now(timezone(timedelta(hours=+5.5),'IST')).date().strftime("%d-%m-%Y"))
+    referral_id: Optional[str] = None
 
     class Config:
         json_schema_extra = {
@@ -146,6 +149,7 @@ class Recruiter(Document):
                 "free_jobs":"5",
                 "approval_status":"awaiting",
                 "date_of_signup":"05-05-2020",
+                "referral_id": "djfhkjkfjdkf",
             }
         }
 

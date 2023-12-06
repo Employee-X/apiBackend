@@ -3,6 +3,8 @@ import uuid
 import math, random
 from datetime import date,timezone,datetime,timedelta
 
+RECRUITER_SIGNUP_LINK = "https://www.employeex.co.in/recruiterregister"
+
 JOB_COUNT_CATEGORY_WISE     =  {"programmingJobs":0,
                             "financeAndAccountingJobProfiles": 0, 
                             "musicAndAudioJobProfiles": 0 , 

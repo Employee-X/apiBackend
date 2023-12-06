@@ -12,6 +12,7 @@ class User_SignUp(BaseModel):
     password: str
     confirm_password: str
     roles: Roles
+    referral: Optional[str] = None
 
     class Config:
         json_schema_extra = {
@@ -21,6 +22,7 @@ class User_SignUp(BaseModel):
                 "password": "3xt3m#",
                 "confirm_password": "3xt3m#",
                 "roles": "job_seeker",
+                "referral": "dgfdhf",
             }
         }
 
@@ -315,6 +317,15 @@ class Success_Message_Response(BaseModel):
         josn_schema_extra = {
             "example": {
                 "message": "Hello world!",
+            }
+        }
+
+class Recruiter_Referral_Response(BaseModel):
+    referral_link: Optional[str] = None
+    class Config:
+        josn_schema_extra = {
+            "example": {
+                "referral_link": "https://www.employeex.co.in?ref='ahsjdjf'",
             }
         }
 
@@ -661,3 +672,4 @@ class admin_log(BaseModel):
                 "inactive_jobs": 0
             }
         }
+

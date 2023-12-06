@@ -2,7 +2,7 @@ from fastapi import Body, APIRouter, HTTPException
 from passlib.context import CryptContext
 
 from auth.jwt_handler import sign_jwt
-
+from utils.email import send_email
 import database.functions.user as user_db
 import database.functions.jobSeeker as job_seeker_db
 import database.functions.recruiter as recruiter_db
@@ -55,7 +55,12 @@ async def user_signup(user: api_models.User_SignUp = Body(...)):
         )
     
     user.password = hash_helper.encrypt(user.password)
-
+    referral = user.referral
+    if referral:
+        rec = await recruiter_db.check_referral(referral)
+        raise HTTPException(status_code=404,detail=referral+" "+str(rec))
+        if not rec: 
+            raise HTTPException(status_code=404,detail="referral expired")
     dbUser =  convertors.apiUserToDbUser(user)
     
            
@@ -89,4 +94,11 @@ async def user_signup(user: api_models.User_SignUp = Body(...)):
         roles = user_exists.roles,
         email_verified=user_exists.email_verified,
         mobile_verified=user_exists.mobile_verified
+    )
+
+@router.post("/sendEmail",response_model=api_models.Success_Message_Response)
+def sendEmail(reciever_email: str,message: str):
+    res = send_email(to_email=reciever_email,body=message + '\n' + "hui hui hui")
+    return api_models.Success_Message_Response(
+        message="Mail sent successfully"
     )

@@ -42,3 +42,4 @@ uvicorn==0.23.2
 wrapt==1.15.0
 yarl==1.9.2
 pycryptodome==3.19.0
+uuid==1.30.0

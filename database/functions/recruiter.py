@@ -1,6 +1,6 @@
 from typing import Union
 from beanie import PydanticObjectId
-
+from uuid import uuid1
 import database.models.models as DbUserModels
 from auth.aes_security import *
 
@@ -76,3 +76,21 @@ async def update_approval_status(userId,status) -> str:
     to_update_profile = await get_recruiter_profile_by_userId(userId)
     updated_profile = await to_update_profile.update(update_query)
     return updated_profile
+
+async def update_ref_id(userId) -> str:
+    ref_id = str(uuid1())
+    update_query = {"$set":{
+        "referral_id": ref_id
+    }}
+    to_update_profile = await get_recruiter_profile_by_userId(userId)
+    _ = await to_update_profile.update(update_query)
+    if _:
+        return ref_id
+    return None
+
+async def check_referral(referral) -> bool:
+    recruiter = await recruiter_collection.find_one({"referral_id": referral})
+    if not recruiter:
+        return False
+    _ = await update_ref_id(recruiter.userId)
+    return True

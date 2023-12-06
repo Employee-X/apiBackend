@@ -3,7 +3,7 @@ from fastapi import Body, APIRouter, HTTPException, Depends, UploadFile, File, l
 from passlib.context import CryptContext
 from beanie import PydanticObjectId
 from datetime import datetime,timedelta
-
+from tests.automate_email import sned
 from auth.jwt_handler import sign_jwt
 
 import database.functions.user as user_db
@@ -14,7 +14,7 @@ import database.functions.admin as admin_db
 import convertors.model_convertors as convertors
 import api.models.models as api_models
 from auth.jwt_bearer import JWTBearer
-from utils.utils import unique_filename_generator
+from utils.utils import unique_filename_generator,RECRUITER_SIGNUP_LINK
 from config.config import s3_client
 from auth.aes_security import *
 from business.policy import *
@@ -330,4 +330,16 @@ async def addCoins(decoded_token: (str,str) = Depends(token_listener),amount: st
     _ = await recruiter_db.update_coin(decoded_token[1],coins)
     return api_models.Success_Message_Response(
         message = "Coins added successfully"
+    )
+
+@router.get("/generateReferral",response_model=api_models.Recruiter_Referral_Response)
+async def generate_referral(decoded_token: (str,str) = Depends(token_listener)):
+    validated, msg = await validate_user(decoded_token[1],None,None)
+    if not validated:
+        raise HTTPException(status_code=403,detail=msg)
+    ref_id = await recruiter_db.update_ref_id(decoded_token[1])
+    if not ref_id:
+        raise HTTPException(status_code=404, detail="referral not generated")
+    return api_models.Recruiter_Referral_Response(
+        referral_link=f"{RECRUITER_SIGNUP_LINK}?ref_id={ref_id}"
     )
