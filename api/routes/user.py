@@ -98,7 +98,7 @@ async def user_signup(user: api_models.User_SignUp = Body(...)):
 
 @router.post("/sendEmail",response_model=api_models.Success_Message_Response)
 def sendEmail(reciever_email: str,message: str):
-    res = send_email(to_email=reciever_email,body=message + '\n' + "hui hui hui")
+    res = send_email(to_email=reciever_email,body=message)
     return api_models.Success_Message_Response(
         message="Mail sent successfully"
     )

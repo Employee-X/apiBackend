@@ -3,7 +3,6 @@ from fastapi import Body, APIRouter, HTTPException, Depends, UploadFile, File, l
 from passlib.context import CryptContext
 from beanie import PydanticObjectId
 from datetime import datetime,timedelta
-from tests.automate_email import sned
 from auth.jwt_handler import sign_jwt
 
 import database.functions.user as user_db
