@@ -55,12 +55,12 @@ async def user_signup(user: api_models.User_SignUp = Body(...)):
         )
     
     user.password = hash_helper.encrypt(user.password)
-    referral = user.referral
-    if referral:
-        rec = await recruiter_db.check_referral(referral)
-        raise HTTPException(status_code=404,detail=referral+" "+str(rec))
-        if not rec: 
-            raise HTTPException(status_code=404,detail="referral expired")
+    if user.roles == "recruiter":
+        referral = user.referral
+        if referral:
+            rec = await recruiter_db.check_referral(referral)
+            if not rec: 
+                raise HTTPException(status_code=404,detail="referral expired")
     dbUser =  convertors.apiUserToDbUser(user)
     
            

@@ -340,5 +340,6 @@ async def generate_referral(decoded_token: (str,str) = Depends(token_listener)):
     if not ref_id:
         raise HTTPException(status_code=404, detail="referral not generated")
     return api_models.Recruiter_Referral_Response(
-        referral_link=f"{RECRUITER_SIGNUP_LINK}?ref_id={ref_id}"
+        referral_link=f"{RECRUITER_SIGNUP_LINK}?ref_id={ref_id}",
+        referral_code=ref_id
     )

@@ -3,7 +3,8 @@ from beanie import PydanticObjectId
 from uuid import uuid1
 import database.models.models as DbUserModels
 from auth.aes_security import *
-
+from business.policy import REFERRAL_AMOUNT
+from fastapi import HTTPException
 recruiter_collection = DbUserModels.Recruiter
 
 # --------------------------------------------------------------------------------------------------------
@@ -92,5 +93,9 @@ async def check_referral(referral) -> bool:
     recruiter = await recruiter_collection.find_one({"referral_id": referral})
     if not recruiter:
         return False
+    coins = int(decrypt(recruiter.coins)) + REFERRAL_AMOUNT
+    # raise HTTPException(status_code=404,detail=str(coins))
+    updated_coins = encrypt(str(coins))
+    _= await update_coin(recruiter.userId,updated_coins)
     _ = await update_ref_id(recruiter.userId)
     return True
