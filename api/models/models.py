@@ -46,7 +46,7 @@ class SendOtp(BaseModel):
         }
 
 class RecvOtp(BaseModel):
-    otp: int
+    otp: Optional[int] = None
 
     class Config:
         json_schema_extra = {
@@ -161,7 +161,7 @@ class Job_Seeker_Profile_With_Id_CV(Job_Seeker_Profile):
 
 class Job_Seeker_Profile_Without_CV(BaseModel):
     id: str
-    fullname: str
+    fullname: Optional[str]
     college: Optional[str]
     gender: Optional[str]
     skills: List[str] = []

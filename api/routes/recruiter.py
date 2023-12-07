@@ -170,19 +170,27 @@ async def filter_applicants(jobId,age_min: int = None,age_max: int = None,locati
         applicant = await jobSeeker_db.get_job_seeker_profile_by_userId(str(applicant_id))
         api_applicant = convertors.dbJobseekerToApiRecruiterWithoutCV(applicant,visited)
         _gender = api_applicant.gender
-        _location = api_applicant.location
-        _dob = datetime.strptime(api_applicant.date_of_birth,"%Y-%m-%d")
+        _location = api_applicant.location 
+
+        if api_applicant.date_of_birth:
+            _dob = datetime.strptime(api_applicant.date_of_birth,"%Y-%m-%d")
+        else:
+            _dob = None
         _today = datetime.now()
-        _age  = _today.year - _dob.year
-        if _today.month < _dob.month or (_today.month==_dob.month and _today.day < _dob.date):
+        if _dob != None:
+            _age  = _today.year - _dob.year
+        else:
+            _age = None
+        if _dob!=None and (_today.month < _dob.month or (_today.month==_dob.month and _today.day < _dob.date)):
             _age -= 1
-        if(age_min!=None and _age<age_min):
+
+        if(age_min!=None and (_age==None or _age<age_min)):
             continue
-        if (age_max!=None and age_max<_age):
+        if (age_max!=None and (_age==None or age_max<_age)):
             continue
-        if(location!=None and location!=_location):
+        if(location!=None and (_location==None or location!=_location)):
             continue
-        if(gender!=None and gender!=_gender):
+        if(gender!=None and (_gender==None or gender!=_gender)):
             continue
         apiApplicants.append(api_applicant)
     return api_models.Seeker_List(
