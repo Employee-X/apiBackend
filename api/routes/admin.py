@@ -12,8 +12,7 @@ import database.functions.job as job_db
 import database.functions.recruiter as recruiter_db
 import convertors.model_convertors as convertors
 from auth.jwt_bearer import JWTBearer
-from utils.utils import unique_filename_generator,Recruiter_Status,Job_Approval_Status
-
+from utils.utils import unique_filename_generator,Recruiter_Status,Job_Approval_Status,JOB_COUNT_CATEGORY_WISE
 
 
 token_listener = JWTBearer()
@@ -78,9 +77,15 @@ async def approveJob(status: Job_Approval_Status,jobId: str,decoded_token: (str,
     validated, msg = await validate_admin(decoded_token[1],None,None)
     if not validated:
         raise HTTPException(status_code=403,detail=msg)
+    job = await job_db.get_job_by_id(jobId)
     _ = await job_db.update_job_approval(jobId,status)
     if not _:
         raise HTTPException(status_code=404,detail="job approval status not updated")
+    updated_job = await job_db.get_job_by_id(jobId)
+    if job.job_approval_status=="hold" and updated_job.job_approval_status=="unhold":
+        JOB_COUNT_CATEGORY_WISE[job.category]+=1
+    elif job.job_approval_status=="unhold" and updated_job.job_approval_status=="hold":
+        JOB_COUNT_CATEGORY_WISE[job.category]-=1
     return apiModels.Success_Message_Response(
         message="Approval Status Changed to {}".format(status)
     )

@@ -43,7 +43,7 @@ async def start_database():
     inactive_jobs = 0
     if jobs:
         for job in jobs:
-            if job.category!=None and job.category in JOB_COUNT_CATEGORY_WISE.keys():
+            if job.category!=None and job.job_approval_status=="unhold" and job.category in JOB_COUNT_CATEGORY_WISE.keys():
                 JOB_COUNT_CATEGORY_WISE[job.category]+=1
             if job.status == "active":
                 active_jobs+=1
