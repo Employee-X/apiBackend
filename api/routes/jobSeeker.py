@@ -169,18 +169,31 @@ async def get_job(jobId,decoded_token: (str,str) = Depends(token_listener)):
 
 # jobs by filtering
 @router.get("/filteredJobs",response_model=api_models.Seeker_Job_List)
-async def get_jobs_by_filter(decoded_token: (str,str) = Depends(token_listener),location: str = None,job_type: str= None,category: str = None,job_role: str = None):
+async def get_jobs_by_filter(decoded_token: (str,str) = Depends(token_listener),
+                             location: str = None,
+                             job_type: str= None,
+                             category: str = None,
+                             job_role: str = None,
+                             min_salary: int = None):
     validated, msg = await validate_user(decoded_token[1], None, None)
     if not validated:
         raise HTTPException(status_code=403, detail=msg)
     profile = await jobSeeker_db.get_job_seeker_profile_by_userId(decoded_token[1])
-    applied_job_ids = profile.jobs_applied
-    jobs = await job_db.get_job_by_filter(category,location,job_type,job_role)
-    if not jobs:
-        raise HTTPException(status_code = 404, detail="Jobs not found")
+    applied_job_ids = profile.jobs_applied.keys()
+    jobs = await job_db.get_all_jobs()
     apiJobs = []
     for job in jobs:
-        if job.job_approval_status == 'hold':
+        if job.job_approval_status == "hold":
+            continue
+        if location!=None and (job.location==None or job.location!=location):
+            continue
+        if job_type!=None and (job.job_type==None or job.job_type!=job_type):
+            continue
+        if category!=None and (job.category==None or job.category!=category):
+            continue
+        if job_role!=None and (job.title==None or job.title!=job_role):
+            continue
+        if min_salary!=None and (job.salary==None or ("max" in job.salary and int(job.salary["max"])<min_salary)):
             continue
         application_status = 'unapplied'
         if job.id in applied_job_ids:
@@ -189,6 +202,25 @@ async def get_jobs_by_filter(decoded_token: (str,str) = Depends(token_listener),
     return api_models.Seeker_Job_List(
         jobs = apiJobs
     )
+    # validated, msg = await validate_user(decoded_token[1], None, None)
+    # if not validated:
+    #     raise HTTPException(status_code=403, detail=msg)
+    # profile = await jobSeeker_db.get_job_seeker_profile_by_userId(decoded_token[1])
+    # applied_job_ids = profile.jobs_applied
+    # jobs = await job_db.get_job_by_filter(category,location,job_type,job_role)
+    # if not jobs:
+    #     raise HTTPException(status_code = 404, detail="Jobs not found")
+    # apiJobs = []
+    # for job in jobs:
+    #     if job.job_approval_status == 'hold':
+    #         continue
+    #     application_status = 'unapplied'
+    #     if job.id in applied_job_ids:
+    #         application_status = profile.jobs_applied[job.id]
+    #     apiJobs.append(convertors.dbJobToApiJobWithStatus(job,application_status))
+    # return api_models.Seeker_Job_List(
+    #     jobs = apiJobs
+    # )
 
 # apply for job
 @router.put("/applyJob/{jobId}", response_model=api_models.Success_Message_Response)
