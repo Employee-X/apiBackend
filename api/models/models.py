@@ -85,6 +85,9 @@ class Job_Seeker_Profile(BaseModel):
     skills: List[str] = []
     img_url: Optional[str] = None
     location: Optional[str] = None
+    years_of_experience: Optional[int] = None
+    speciality: Optional[str] = None
+    current_salary: Optional[str] = None
     
 
     class Config:
@@ -102,6 +105,9 @@ class Job_Seeker_Profile(BaseModel):
                 "skills": ["Python", "Java", "JavaScript"],
                 "img_url": "https://aws.s3.com/abc123.pdf",
                 "location": "Lucknow",
+                "years_of_experience": "2",
+                "speciality": "Web Development",
+                "current_salary": "6 LPA",
             }
         }
 
@@ -125,6 +131,9 @@ class Job_Seeker_Get_Profile(Job_Seeker_Profile):
                 "img_url": "https://aws.s3.com/abc123.pdf",
                 "location": "Lucknow",
                 "cv_uploaded": "False",
+                "years_of_experience": "2",
+                "speciality": "Web Development",
+                "current_salary": "6 LPA",
             }
         }
 
@@ -156,22 +165,29 @@ class Job_Seeker_Profile_With_Id_CV(Job_Seeker_Profile):
                 "img_url": "https://aws.s3.com/abc123.pdf",
                 "loaction": "Lucknow",
                 'cv_uploaded': "False",
+                "years_of_experience": "2",
+                "speciality": "Web Development",
+                "current_salary": "6 LPA",
             }
         }
 
 class Job_Seeker_Profile_Without_CV(BaseModel):
     id: str
-    fullname: Optional[str]
-    college: Optional[str]
-    gender: Optional[str]
-    skills: List[str] = []
-    img_url: Optional[str]
-    description: Optional[str]
-    visited: Optional[bool]
-    location: Optional[str]
-    date_of_birth: Optional[str]
-    cv_uploaded: Optional[bool]
+    fullname: Optional[str] = None
+    college: Optional[str] = None
+    gender: Optional[str] = None
+    skills: List[str] = None
+    img_url: Optional[str] = None
+    description: Optional[str] = None
+    visited: Optional[bool] = None
+    location: Optional[str] = None
+    date_of_birth: Optional[str] = None
+    cv_uploaded: Optional[bool] = None
+    years_of_experience: Optional[int] = None
+    speciality: Optional[str] = None
+    current_salary: Optional[str] = None
 
+    
     class Config:
         json_schema_extra = {
             "example": {
@@ -186,6 +202,9 @@ class Job_Seeker_Profile_Without_CV(BaseModel):
                 "location": "Lucknow",
                 "date_of_birth": "2002-05-05",
                 "cv_uploaded": "False",
+                "years_of_experience": "2",
+                "speciality": "Web Development",
+                "current_salary": "6 LPA",
             }
         }
 
@@ -210,6 +229,9 @@ class Seeker_List(BaseModel):
                         "visited": "false",
                         "date_of_birth": "2002-05-05",
                         "cv_uploaded": "False",
+                        "years_of_experience": "2",
+                        "speciality": "Web Development",
+                        "current_salary": "6 LPA",
                     },
                     {
                         "id": "1234567890",
@@ -223,6 +245,9 @@ class Seeker_List(BaseModel):
                         "visited": "false",
                         "date_of_birth": "2002-05-05",
                         "cv_uploaded": "False",
+                        "years_of_experience": "2",
+                        "speciality": "Web Development",
+                        "current_salary": "6 LPA",
                     },
                 ]
             }

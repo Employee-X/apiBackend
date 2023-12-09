@@ -24,7 +24,9 @@ router = APIRouter()
 
 hash_helper = CryptContext(schemes=["bcrypt"])
 
-async def validate_user(user_id: str, email_id: Optional[str], mobile: Optional[str]):
+async def validate_user(user_id: str,
+                        email_id: Optional[str],
+                        mobile: Optional[str]):
     user = await user_db.get_user_by_id(user_id)
     if user and user.roles == "recruiter" and user.email_verified and user.mobile_verified:
         if email_id:
@@ -39,7 +41,8 @@ async def validate_user(user_id: str, email_id: Optional[str], mobile: Optional[
 # -----------------------------------------------RECRUITER POST LOGIN ROUTES-------------------------------------------------
 # update profile
 @router.post("/updateProfile", response_model=api_models.Success_Message_Response)
-async def update_profile(decoded_token: (str,str) = Depends(token_listener),recruiter_profile: api_models.Recruiter_Profile = Body(...)):
+async def update_profile(decoded_token: (str,str) = Depends(token_listener),
+                         recruiter_profile: api_models.Recruiter_Profile = Body(...)):
     validated, msg = await validate_user(decoded_token[1],recruiter_profile.email,recruiter_profile.phone_number)
     if not validated:
         raise HTTPException(status_code=403, detail=msg)
@@ -63,7 +66,8 @@ async def get_profile(decoded_token: (str,str) = Depends(token_listener)):
 
 # Add job
 @router.post("/addJob", response_model=api_models.Success_Message_Response)
-async def add_job(decoded_token: (str,str) = Depends(token_listener),job: api_models.Job = Body(...)):
+async def add_job(decoded_token: (str,str) = Depends(token_listener),
+                  job: api_models.Job = Body(...)):
     validated, msg = await validate_user(decoded_token[1], None, None)
     if not validated:
         raise HTTPException(status_code=403, detail=msg)
@@ -106,7 +110,9 @@ async def get_my_jobs(decoded_token: (str,str) = Depends(token_listener)):
 
 # update job
 @router.post("/updateJob/{jobId}", response_model=api_models.Success_Message_Response)
-async def update_job(jobId,decoded_token: (str,str) = Depends(token_listener),job: api_models.Job = Body(...)):
+async def update_job(jobId,
+                     decoded_token: (str,str) = Depends(token_listener),
+                     job: api_models.Job = Body(...)):
     validated, msg = await validate_user(decoded_token[1], None, None)
     if not validated:
         raise HTTPException(status_code=403, detail=msg)
@@ -124,7 +130,8 @@ async def update_job(jobId,decoded_token: (str,str) = Depends(token_listener),jo
 
 # delete job
 @router.delete("/deleteJob/{jobId}", response_model=api_models.Success_Message_Response)
-async def delete_job(jobId,decoded_token: (str,str) = Depends(token_listener)):
+async def delete_job(jobId,
+                     decoded_token: (str,str) = Depends(token_listener)):
     validated, msg = await validate_user(decoded_token[1], None, None)
     if not validated:
         raise HTTPException(status_code=403, detail=msg)
@@ -137,7 +144,8 @@ async def delete_job(jobId,decoded_token: (str,str) = Depends(token_listener)):
 
 # get job applicants
 @router.get("/getJobApplicants/{jobId}", response_model=api_models.Seeker_List)
-async def get_job_applicants(jobId,decoded_token: (str,str) = Depends(token_listener)):
+async def get_job_applicants(jobId,
+                             decoded_token: (str,str) = Depends(token_listener)):
     validated, msg = await validate_user(decoded_token[1], None, None)
     if not validated:
         raise HTTPException(status_code=403, detail=msg)
@@ -156,7 +164,12 @@ async def get_job_applicants(jobId,decoded_token: (str,str) = Depends(token_list
 
 # job applicants filter
 @router.get("/filterApplicants/{jobId}",response_model=api_models.Seeker_List)
-async def filter_applicants(jobId,age_min: int = None,age_max: int = None,location: str = None,gender: str = None,decoded_token: (str,str) = Depends(token_listener)):
+async def filter_applicants(jobId,age_min: int = None,
+                            age_max: int = None,
+                            location: str = None,
+                            gender: str = None,
+                            years_of_experience: int = None,
+                            decoded_token: (str,str) = Depends(token_listener)):
     validated, msg = await validate_user(decoded_token[1], None, None)
     if not validated:
         raise HTTPException(status_code=403, detail=msg)
@@ -171,6 +184,7 @@ async def filter_applicants(jobId,age_min: int = None,age_max: int = None,locati
         api_applicant = convertors.dbJobseekerToApiRecruiterWithoutCV(applicant,visited)
         _gender = api_applicant.gender
         _location = api_applicant.location 
+        _year_of_experience = api_applicant.years_of_experience
 
         if api_applicant.date_of_birth:
             _dob = datetime.strptime(api_applicant.date_of_birth,"%Y-%m-%d")
@@ -191,6 +205,8 @@ async def filter_applicants(jobId,age_min: int = None,age_max: int = None,locati
         if(location!=None and (_location==None or location!=_location)):
             continue
         if(gender!=None and (_gender==None or gender!=_gender)):
+            continue
+        if(years_of_experience!=None and (_year_of_experience==None or years_of_experience>_year_of_experience)):
             continue
         apiApplicants.append(api_applicant)
     return api_models.Seeker_List(
@@ -324,20 +340,20 @@ async def getCoin(decoded_token: (str,str) = Depends(token_listener)):
     )
 
 #addCoin
-@router.post("/addCoin",response_model = api_models.Success_Message_Response)
-async def addCoins(decoded_token: (str,str) = Depends(token_listener),amount: str = encrypt('0')):
-    validated, msg = await validate_user(decoded_token[1],None,None)
-    if not validated:
-        raise HTTPException(status_code=403,detail=msg)
-    coins = await recruiter_db.get_coins(decoded_token[1])
-    if not coins:
-        raise HTTPException(status_code=404,detail="coin not fetched")
-    amount = int(decrypt(coins)) + int(decrypt(amount))
-    coins = encrypt(str(amount))
-    _ = await recruiter_db.update_coin(decoded_token[1],coins)
-    return api_models.Success_Message_Response(
-        message = "Coins added successfully"
-    )
+# @router.post("/addCoin",response_model = api_models.Success_Message_Response)
+# async def addCoins(decoded_token: (str,str) = Depends(token_listener),amount: str = encrypt('0')):
+#     validated, msg = await validate_user(decoded_token[1],None,None)
+#     if not validated:
+#         raise HTTPException(status_code=403,detail=msg)
+#     coins = await recruiter_db.get_coins(decoded_token[1])
+#     if not coins:
+#         raise HTTPException(status_code=404,detail="coin not fetched")
+#     amount = int(decrypt(coins)) + int(decrypt(amount))
+#     coins = encrypt(str(amount))
+#     _ = await recruiter_db.update_coin(decoded_token[1],coins)
+#     return api_models.Success_Message_Response(
+#         message = "Coins added successfully"
+#     )
 
 @router.get("/generateReferral",response_model=api_models.Recruiter_Referral_Response)
 async def generate_referral(decoded_token: (str,str) = Depends(token_listener)):

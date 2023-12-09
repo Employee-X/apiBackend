@@ -57,7 +57,9 @@ class Job_Seeker(Document):
     cv_uploaded: Optional[bool] = False
     cv_verified_status: bool = False
     img_url: Optional[str] = "https://employeex.s3.ap-south-1.amazonaws.com/Default+pics/Def_User.png"
-
+    years_of_experience: Optional[int] = None
+    speciality: Optional[str] = None
+    current_salary: Optional[str] = None
     jobs_applied: Optional[Dict[PydanticObjectId,Applicant_Status]] = {}
 
     class Config:
@@ -80,6 +82,9 @@ class Job_Seeker(Document):
                 "cv_uploaded": False,
                 "cv_verified_status": False,
                 "img_url": "https://aws.s3.com/abc123.pdf",
+                "years_of_experience": "2",
+                "speciality": "Web Development",
+                "current_salary": "6 LPA",
                 "jobs_applied": {"1234567890":"applied"},
             }
         }
