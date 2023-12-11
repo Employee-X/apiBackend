@@ -195,7 +195,7 @@ async def filter_applicants(jobId,age_min: int = None,
             _age  = _today.year - _dob.year
         else:
             _age = None
-        if _dob!=None and (_today.month < _dob.month or (_today.month==_dob.month and _today.day < _dob.date)):
+        if _dob!=None and (_today.month < _dob.month or (_today.month==_dob.month and _today.day < _dob.day)):
             _age -= 1
 
         if(age_min!=None and (_age==None or _age<age_min)):
