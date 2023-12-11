@@ -198,9 +198,9 @@ async def filter_applicants(jobId,age_min: int = None,
         if _dob!=None and (_today.month < _dob.month or (_today.month==_dob.month and _today.day < _dob.day)):
             _age -= 1
 
-        if(age_min!=None and (_age==None or _age<age_min)):
+        if(age_min!=None and age_min!=0 and (_age==None or _age<age_min)):
             continue
-        if (age_max!=None and (_age==None or age_max<_age)):
+        if (age_max!=None and age_max!=99 and (_age==None or age_max<_age)):
             continue
         if(location!=None and (_location==None or location!=_location)):
             continue
