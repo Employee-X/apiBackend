@@ -6,6 +6,8 @@ from auth.aes_security import *
 from business.policy import REFERRAL_AMOUNT
 from fastapi import HTTPException
 recruiter_collection = DbUserModels.Recruiter
+from utils.utils import Transactions
+from datetime import date,timezone,datetime,timedelta
 
 # --------------------------------------------------------------------------------------------------------
 
@@ -89,6 +91,16 @@ async def update_ref_id(userId) -> str:
         return ref_id
     return None
 
+async def add_mssg(userId,amount: int,type: Transactions):
+    date = str(datetime.now(timezone(timedelta(hours=+5.5),'IST')).date().strftime("%d-%m-%Y"))
+    time = str(datetime.now(timezone(timedelta(hours=+5.5),'IST')).time().strftime("%H:%M"))
+    update_query = {"$push":{
+        "transactions": (date,time,type,amount)
+    }}
+    to_update_profile = await get_recruiter_profile_by_userId(userId)
+    updated_profile = await to_update_profile.update(update_query)
+    return updated_profile
+
 async def check_referral(referral) -> bool:
     recruiter = await recruiter_collection.find_one({"referral_id": referral})
     if not recruiter:
@@ -98,4 +110,10 @@ async def check_referral(referral) -> bool:
     updated_coins = encrypt(str(coins))
     _= await update_coin(recruiter.userId,updated_coins)
     _ = await update_ref_id(recruiter.userId)
+    _ = await add_mssg(recruiter.userId,REFERRAL_AMOUNT,"referral")
     return True
+
+async def get_transaction_history(userId):
+    recuiter = await get_recruiter_profile_by_userId(userId)
+    transactions_list = recuiter.transactions
+    return transactions_list

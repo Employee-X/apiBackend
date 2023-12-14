@@ -80,6 +80,7 @@ async def add_job(decoded_token: (str,str) = Depends(token_listener),
         coins = encrypt(str(new_coin_value))
         _ = await recruiter_db.update_free_job(decoded_token[1],-1)
         _ = await recruiter_db.update_coin(decoded_token[1],coins)
+        _ = await recruiter_db.add_mssg(decoded_token[1],COINS_ON_NEW_JOB,"job_posting")
     job_approval_status = "hold"
     if recruiter.approval_status == "allowed":
         job_approval_status = "unhold"
@@ -366,4 +367,17 @@ async def generate_referral(decoded_token: (str,str) = Depends(token_listener)):
     return api_models.Recruiter_Referral_Response(
         referral_link=f"{RECRUITER_SIGNUP_LINK}?ref_id={ref_id}",
         referral_code=ref_id
+    )
+
+@router.get("/transactions",response_model=api_models.transaction_history)
+async def transactions(decoded_token: (str,str) = Depends(token_listener)):
+    validated, msg = await validate_user(decoded_token[1],None,None)
+    if not validated:
+        raise HTTPException(status_code=403,detail=msg)
+    _transactions = await recruiter_db.get_transaction_history(decoded_token[1])
+    api_transactions = []
+    for transaction in _transactions:
+        api_transactions.append(convertors.dbTransactionsToApiTransaction(transaction))
+    return api_models.transaction_history(
+        transactions=api_transactions
     )

@@ -243,3 +243,11 @@ def dbAdminToApiAdmin(admin: DbUserModels.Admin) -> apiModels.admin_log:
         active_jobs=admin.active_jobs,
         inactive_jobs=admin.inactive_jobs,
     )
+
+def dbTransactionsToApiTransaction(transaction) -> apiModels.transaction_mssg:
+    return apiModels.transaction_mssg(
+        date=transaction[0],
+        time=transaction[1],
+        type=transaction[2],
+        amount=transaction[3],
+    )

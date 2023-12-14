@@ -7,6 +7,7 @@ RECRUITER_SIGNUP_LINK = "https://www.employeex.co.in/recruiterregister"
 FROM_EMAIL = "employeex.iitd@gmail.com"
 FROM_EMAIL_PASSWORD = "ixzrculxnwujopzn"
 
+
 JOB_COUNT_CATEGORY_WISE     =  {"programmingJobs":0,
                             "financeAndAccountingJobProfiles": 0, 
                             "musicAndAudioJobProfiles": 0 , 
@@ -17,6 +18,11 @@ JOB_COUNT_CATEGORY_WISE     =  {"programmingJobs":0,
                             "healthAndPharmacyJobProfiles":0,
                             "others":0,
                             }
+
+class Transactions(str,Enum):
+    job_posting = "job_posting"
+    referral = "referral"
+    recharge = "recharge"
 
 class Roles(str, Enum):
     job_seeker = "job_seeker"

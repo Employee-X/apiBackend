@@ -3,7 +3,7 @@ from fastapi.security import HTTPBasicCredentials
 from pydantic import BaseModel, EmailStr, Field
 from pydantic_extra_types.phone_numbers import PhoneNumber
 from typing import Optional, List,Dict
-from utils.utils import Roles,Gender,Profession,Applicant_Status,Recruiter_Status,Job_Approval_Status
+from utils.utils import Roles,Gender,Profession,Applicant_Status,Recruiter_Status,Job_Approval_Status,Transactions
 
 # User Auth Models
 class User_SignUp(BaseModel):
@@ -349,12 +349,50 @@ class Recruiter_Referral_Response(BaseModel):
     referral_link: Optional[str] = None
     referral_code: Optional[str] = None
     class Config:
-        josn_schema_extra = {
+        json_schema_extra = {
             "example": {
                 "referral_link": "https://www.employeex.co.in?ref='ahsjdjf'",
                 "referral_code": "akfjdkh",
             }
         }
+
+class transaction_mssg(BaseModel):
+    date: Optional[str] = None
+    time: Optional[str] = None
+    type: Optional[Transactions] = None
+    amount: Optional[int] = None
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "date": "05-05-2020",
+                "time": "8:20",
+                "type": "referral",
+                "amount": 500,
+            }
+        }
+
+class transaction_history(BaseModel):
+    transactions: List[transaction_mssg] = []
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "transactions":[
+                    {
+                        "date": "05-05-2020",
+                        "time": "8:20",
+                        "type": "referral",
+                        "amount": 500,
+                    },
+                    {
+                        "date": "05-05-2020",
+                        "time": "8:20",
+                        "type": "referral",
+                        "amount": 500,   
+                    }
+                ]
+            }
+        }
+
 
 class Job(BaseModel):
     title: Optional[str] = None
