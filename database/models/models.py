@@ -156,7 +156,7 @@ class Recruiter(Document):
                 "approval_status":"awaiting",
                 "date_of_signup":"05-05-2020",
                 "referral_id": "djfhkjkfjdkf",
-                "transactions": [("05-05-2020","8:20","referral",500),("05-05-2020","9:40","job_posting",300)],
+                "transactions": [("05-05-2020","8:20","referral",500,None),("05-05-2020","9:40","job_posting",300,None)],
             }
         }
 

@@ -377,7 +377,11 @@ async def transactions(decoded_token: (str,str) = Depends(token_listener)):
     _transactions = await recruiter_db.get_transaction_history(decoded_token[1])
     api_transactions = []
     for transaction in _transactions:
-        api_transactions.append(convertors.dbTransactionsToApiTransaction(transaction))
+        name = ""
+        if(transaction[4]!=None):
+            referred_id = await recruiter_db.get_recruiter_by_email(transaction[4])
+            name = referred_id.your_name
+        api_transactions.append(convertors.dbTransactionsToApiTransaction(transaction,name))
     return api_models.transaction_history(
         transactions=api_transactions
     )

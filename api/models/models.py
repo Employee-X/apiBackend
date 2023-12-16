@@ -361,6 +361,7 @@ class transaction_mssg(BaseModel):
     time: Optional[str] = None
     type: Optional[Transactions] = None
     amount: Optional[int] = None
+    name: Optional[str] = None
     class Config:
         json_schema_extra = {
             "example": {
@@ -368,6 +369,7 @@ class transaction_mssg(BaseModel):
                 "time": "8:20",
                 "type": "referral",
                 "amount": 500,
+                "name": "Shivam",
             }
         }
 

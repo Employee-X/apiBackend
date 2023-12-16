@@ -23,6 +23,7 @@ class Transactions(str,Enum):
     job_posting = "job_posting"
     referral = "referral"
     recharge = "recharge"
+    signup_bonus = "signup_bonus"
 
 class Roles(str, Enum):
     job_seeker = "job_seeker"

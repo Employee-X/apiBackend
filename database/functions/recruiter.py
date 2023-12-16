@@ -91,17 +91,17 @@ async def update_ref_id(userId) -> str:
         return ref_id
     return None
 
-async def add_mssg(userId,amount: int,type: Transactions):
+async def add_mssg(userId,amount: int,type: Transactions,email: str = None):
     date = str(datetime.now(timezone(timedelta(hours=+5.5),'IST')).date().strftime("%d-%m-%Y"))
     time = str(datetime.now(timezone(timedelta(hours=+5.5),'IST')).time().strftime("%H:%M"))
     update_query = {"$push":{
-        "transactions": (date,time,type,amount)
+        "transactions": (date,time,type,amount,email)
     }}
     to_update_profile = await get_recruiter_profile_by_userId(userId)
     updated_profile = await to_update_profile.update(update_query)
     return updated_profile
 
-async def check_referral(referral) -> bool:
+async def check_referral(referral,email: str = None) -> bool:
     recruiter = await recruiter_collection.find_one({"referral_id": referral})
     if not recruiter:
         return False
@@ -110,7 +110,7 @@ async def check_referral(referral) -> bool:
     updated_coins = encrypt(str(coins))
     _= await update_coin(recruiter.userId,updated_coins)
     _ = await update_ref_id(recruiter.userId)
-    _ = await add_mssg(recruiter.userId,REFERRAL_AMOUNT,"referral")
+    _ = await add_mssg(recruiter.userId,REFERRAL_AMOUNT,"referral",email)
     return True
 
 async def get_transaction_history(userId):
