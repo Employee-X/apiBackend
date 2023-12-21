@@ -54,7 +54,7 @@ async def get_img(userId) -> (Union[str, None]):
 
 async def get_coins(userId) -> str:
     profile = await get_recruiter_profile_by_userId(userId)
-    return profile.coins
+    return profile.coins,profile.earning_by_referral
 
 async def update_coin(userId,value) -> str:
     update_query = {"$set":{
@@ -105,6 +105,11 @@ async def check_referral(referral,email: str = None) -> bool:
     recruiter = await recruiter_collection.find_one({"referral_id": referral})
     if not recruiter:
         return False
+    referral_coins = int(decrypt(recruiter.earning_by_referral)) + REFERRAL_AMOUNT
+    update_query = {"$set":{
+        "earning_by_referral": encrypt(str(referral_coins))
+    }}
+    _ = await recruiter.update(update_query)
     coins = int(decrypt(recruiter.coins)) + REFERRAL_AMOUNT
     # raise HTTPException(status_code=404,detail=str(coins))
     updated_coins = encrypt(str(coins))

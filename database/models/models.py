@@ -137,6 +137,7 @@ class Recruiter(Document):
     date_of_signup: Optional[str] = str(datetime.now(timezone(timedelta(hours=+5.5),'IST')).date().strftime("%d-%m-%Y"))
     referral_id: Optional[str] = None
     transactions: List[tuple] = []
+    earning_by_referral: Optional[str] = None
 
     class Config:
         json_schema_extra = {
@@ -157,6 +158,7 @@ class Recruiter(Document):
                 "date_of_signup":"05-05-2020",
                 "referral_id": "djfhkjkfjdkf",
                 "transactions": [("05-05-2020","8:20","referral",500,None),("05-05-2020","9:40","job_posting",300,None)],
+                "earning_by_referral": "fahhfjjkddf",
             }
         }
 

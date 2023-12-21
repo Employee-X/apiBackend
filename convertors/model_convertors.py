@@ -84,7 +84,8 @@ def apiRecruiterProfileToDbRecruiterProfile(profile: apiModels.Recruiter_Profile
         phone_number= profile.phone_number,
         linkedin= profile.linkedin,
         descripion=profile.description,
-        coins=encrypt(str(VERIFIED_RECRUITER_COINS))
+        coins=encrypt(str(VERIFIED_RECRUITER_COINS)),
+        earning_by_referral=encrypt(str(0)),
     )
 
 def apiCollegeProfileToDbCollegeProfile(profile: apiModels.College_Profile, userId: PydanticObjectId) -> DbUserModels.College:

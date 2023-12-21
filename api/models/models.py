@@ -328,10 +328,12 @@ class IMG_Response(BaseModel):
 
 class Coin(BaseModel):
     coins: Optional[str] = None
+    earning_by_referral: Optional[str] = None
     class Config:
         json_schema_extra={
             "example":{
-                "coins":"absdjkfjd=dksd"
+                "coins":"absdjkfjd=dksd",
+                "earning_by_referral":"jsafha-afjf=ff",
             }   
         }
 
@@ -384,12 +386,14 @@ class transaction_history(BaseModel):
                         "time": "8:20",
                         "type": "referral",
                         "amount": 500,
+                        "name": "Shivam",
                     },
                     {
                         "date": "05-05-2020",
                         "time": "8:20",
                         "type": "referral",
                         "amount": 500,   
+                        "name": "Shivam",
                     }
                 ]
             }

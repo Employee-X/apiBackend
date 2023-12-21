@@ -9,6 +9,7 @@ from api.routes.college import router as CLLGRouter
 from api.routes.recruiter import router as RECRouter
 from api.routes.admin import router as ADMRouter
 from utils.utils import JOB_COUNT_CATEGORY_WISE
+from auth.aes_security import *
 import database.models.models as DbUserModels
 import database.functions.job as job_db
 from beanie import PydanticObjectId
@@ -78,7 +79,7 @@ async def update():
     recuiters = await recruiter_collection.find().to_list()
     for recuiter in recuiters:
         update_query = {"$set":{
-            "transactions": []
+            "earning_by_referral": encrypt(str(0))
         }}
         _ = await recuiter.update(update_query)
     # for recruiter in recuiters:

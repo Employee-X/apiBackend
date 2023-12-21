@@ -75,7 +75,7 @@ async def add_job(decoded_token: (str,str) = Depends(token_listener),
     logo = recruiter.img_url
     free_jobs = recruiter.free_jobs
     if free_jobs>0:
-        coins = await recruiter_db.get_coins(decoded_token[1])
+        coins,_ = await recruiter_db.get_coins(decoded_token[1])
         new_coin_value = int(decrypt(coins)) + COINS_ON_NEW_JOB
         coins = encrypt(str(new_coin_value))
         _ = await recruiter_db.update_free_job(decoded_token[1],-1)
@@ -229,7 +229,7 @@ async def get_user_profile(userId,job_id,decoded_token: (str,str) = Depends(toke
     is_visited_profile = job_profile.applicants[PydanticObjectId(userId)]
     if not is_visited_profile:
         # decreasing the total coins and giving insufficint mssg for CV view
-        coins = await recruiter_db.get_coins(decoded_token[1])
+        coins,_ = await recruiter_db.get_coins(decoded_token[1])
         value_of_coins = int(decrypt(coins))
         new_value = value_of_coins - COINS_DECREASE_ON_CV_VIEW
         if new_value<0:
@@ -333,11 +333,12 @@ async def getCoin(decoded_token: (str,str) = Depends(token_listener)):
     validated, msg = await validate_user(decoded_token[1],None,None)
     if not validated:
         raise HTTPException(status_code=403,detail=msg)
-    coins = await recruiter_db.get_coins(decoded_token[1])
+    coins,earning_by_referral = await recruiter_db.get_coins(decoded_token[1])
     if not coins:
         raise HTTPException(status_code=404,detail="coin not fetched")
     return api_models.Coin(
-        coins = coins
+        coins = coins,
+        earning_by_referral=decrypt(earning_by_referral),
     )
 
 #addCoin
