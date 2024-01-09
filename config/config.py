@@ -2,7 +2,6 @@ from typing import Optional
 from beanie import init_beanie
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic_settings import BaseSettings
-
 import database.models as dbModels
 from aiobotocore.session import get_session
 
@@ -16,6 +15,9 @@ class Settings(BaseSettings):
     algorithm: str = "HS256"
     AES_KEY: str = "AES128"
     ADMIN_ID: str = "adminid"
+
+    # OTP
+    OTP_API_KEY: str = "otp_key"
 
     # AWS S3 Configuration
     AWS_ACCESS_KEY_ID: Optional[str] = None

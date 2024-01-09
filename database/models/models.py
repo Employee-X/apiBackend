@@ -13,8 +13,8 @@ class User(Document):
     mobile: PhoneNumber
     password: str
     roles: Roles
-    email_verified: bool = True
-    mobile_verified: bool = True
+    email_verified: bool = False
+    mobile_verified: bool = False
     otp: Optional[int] = 000000
     otp_expiration: Optional[str] = "2023-04-01T05:00:30.001000"
     referral: Optional[str] = None

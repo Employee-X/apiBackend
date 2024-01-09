@@ -51,6 +51,7 @@ async def update_otp(user_id: str, otp: int) -> Union[DbUserModels.User, None]:
 async def update_email_verified(user_id: str) -> Union[DbUserModels.User, None]:
     update_query = {"$set": {
         "email_verified": True,
+        "mobile_verified": True,
     }}
     user_to_update = await get_user_by_id(user_id)
     updated_user = await user_to_update.update(update_query)

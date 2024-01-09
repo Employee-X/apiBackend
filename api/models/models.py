@@ -37,20 +37,26 @@ class User_SignIn(HTTPBasicCredentials):
 
 class SendOtp(BaseModel):
     email: EmailStr
+    phone_number: PhoneNumber
 
     class Config:
         json_schema_extra = {
             "example": {
                 "email": "abc123@gmail.com",
+                "phone_number": "+919988775566",
             }
         }
 
 class RecvOtp(BaseModel):
+    email: EmailStr
+    phone_number: PhoneNumber
     otp: Optional[int] = None
 
     class Config:
         json_schema_extra = {
             "example": {
+                "email": "abc123@gmail.com",
+                "phone_number": "+919988775566",
                 "otp": 123456,
             }
         }

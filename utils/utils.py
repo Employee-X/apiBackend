@@ -189,6 +189,3 @@ def unique_filename_generator(filename):
     new_filename = "%s.%s" % (uuid.uuid4(), ext)
     return new_filename
 
-def otp_generator():
-    otp = random.randint(100000, 999999)
-    return otp

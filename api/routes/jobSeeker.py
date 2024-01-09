@@ -14,8 +14,10 @@ import database.functions.job as job_db
 import convertors.model_convertors as convertors
 import api.models.models as api_models
 from auth.jwt_bearer import JWTBearer
-from utils.utils import unique_filename_generator, otp_generator
+from utils.utils import unique_filename_generator
+from auth.otp import otp_generator,send_otp_phone
 from config.config import s3_client
+import database.functions.admin as admin_db
 
 token_listener = JWTBearer()
 
@@ -35,8 +37,9 @@ async def validate_user(user_id: str, email_id: Optional[str], mobile: Optional[
         return True, ""
     return False, "Unauthorized Access"
 
-async def validate_user_before_verify(user_id: str, email_id: Optional[str], mobile: Optional[str]):
-    user = await user_db.get_user_by_id(user_id)
+async def validate_user_before_verify(email_id: Optional[str], mobile: Optional[str]):
+    user = await user_db.get_user_by_email(email_id)
+    # user = await user_db.get_user_by_id(user_id)
     if user and user.roles == "job_seeker":
         if email_id:
             if user.email != email_id:
@@ -263,45 +266,52 @@ async def get_applied_jobs(decoded_token: (str,str) = Depends(token_listener)):
     )
 
 # generate otp and send over email
-@router.post("/generateOtp", response_model=api_models.Success_Message_Response)
-async def generate_otp(decoded_token: (str,str) = Depends(token_listener),email_input: api_models.SendOtp = Body(...)):
-    validated, msg = await validate_user_before_verify(decoded_token[1], email_input.email, None)
-    if not validated:
-        raise HTTPException(status_code=403, detail=msg)
-    user = await user_db.get_user_by_id(decoded_token[1])
-    current_time = datetime.datetime.now()
-    expiration_tim_str = user.otp_expiration
-    if expiration_tim_str:
-        expiration_time = datetime.datetime.fromisoformat(expiration_tim_str)
-        # if otp already exists and is not expired
-        if user.otp and user.otp_expiration and current_time < expiration_time:
-            time_remaining = expiration_time - current_time
-            time_instring = int(time_remaining.total_seconds())
-            raise HTTPException(status_code=403, detail=f"OTP already sent and is not expired. Try again in {time_instring} seconds")
-    otp = otp_generator()
-    response_email = await s3_client.send_otp_email(otp,email_input.email)
-    res = await user_db.update_otp(decoded_token[1],otp)
-    return api_models.Success_Message_Response(
-        message = "OTP sent successfully"
-    )
+# @router.post("/generateOtp", response_model=api_models.Success_Message_Response)
+# async def generate_otp(email_input: api_models.SendOtp = Body(...)):
+#     validated, msg = await validate_user_before_verify(email_id=email_input.email,mobile=email_input.phone_number)
+#     if not validated:
+#         raise HTTPException(status_code=403, detail=msg)
+#     user = await user_db.get_user_by_email(email=email_input.email)
+#     current_time = datetime.datetime.now()
+#     expiration_tim_str = user.otp_expiration
+#     if expiration_tim_str:
+#         expiration_time = datetime.datetime.fromisoformat(expiration_tim_str)
+#         # if otp already exists and is not expired
+#         if user.otp and user.otp_expiration and current_time < expiration_time:
+#             time_remaining = expiration_time - current_time
+#             time_instring = int(time_remaining.total_seconds())
+#             raise HTTPException(status_code=403, detail=f"OTP already sent and is not expired. Try again in {time_instring} seconds")
+#     otp = otp_generator()
+#     _ = send_otp_phone(otp,email_input.phone_number)
+#     res = await user_db.update_otp(user.id,otp)
+#     return api_models.Success_Message_Response(
+#         message = "OTP sent successfully"
+#     )
 
 # verify otp
-@router.post("/verifyOtp", response_model=api_models.Success_Message_Response)
-async def verify_otp(decoded_token: (str,str) = Depends(token_listener),otp_input: api_models.RecvOtp = Body(...)):
-    validated, msg = await validate_user_before_verify(decoded_token[1], None, None)
-    if not validated:
-        raise HTTPException(status_code=403, detail=msg)
-    user = await user_db.get_user_by_id(decoded_token[1])
-    current_time = datetime.datetime.now()
-    expiration_tim_str = user.otp_expiration
-    if expiration_tim_str:
-        expiration_time = datetime.datetime.fromisoformat(expiration_tim_str)
-        if user.otp and user.otp_expiration and current_time < expiration_time and user.otp == otp_input.otp:
-            res = await user_db.update_email_verified(decoded_token[1])
-            return api_models.Success_Message_Response(
-                message = "Account verified successfully"
-            )
-    raise HTTPException(status_code=403, detail="OTP is invalid or expired")
+# @router.post("/verifyOtp", response_model=api_models.User_SignIn_Response)
+# async def verify_otp(otp_input: api_models.RecvOtp = Body(...)):
+#     validated, msg = await validate_user_before_verify(email_id=otp_input.email,mobile=otp_input.phone_number)
+#     if not validated:
+#         raise HTTPException(status_code=403, detail=msg)
+#     user = await user_db.get_user_by_email(email=otp_input.email)
+#     current_time = datetime.datetime.now()
+#     expiration_tim_str = user.otp_expiration
+#     if expiration_tim_str:
+#         expiration_time = datetime.datetime.fromisoformat(expiration_tim_str)
+#         if user.otp and user.otp_expiration and current_time < expiration_time and user.otp == otp_input.otp:
+#             res = await user_db.update_email_verified(user.id)    
+#             # user_exists = await user_db.get_user_by_email(otp_input.email)
+#             # if user_exists:
+#             token = sign_jwt(str(user.id))
+#             _ = await admin_db.incr_login()
+#             return api_models.User_SignIn_Response(
+#                 access_token = token,
+#                 roles = user.roles,
+#                 email_verified=user.email_verified,
+#                 mobile_verified=user.mobile_verified,
+#                 )
+#     raise HTTPException(status_code=403, detail="OTP is invalid or expired")
 
 
 #update profile image
