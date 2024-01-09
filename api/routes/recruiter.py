@@ -38,12 +38,26 @@ async def validate_user(user_id: str,
         return True, ""
     return False, "Unauthorized Access"
 
+async def validate_user_without_verification(user_id: str,
+                                        email_id: Optional[str],
+                                        mobile: Optional[str]):
+    user = await user_db.get_user_by_id(user_id)
+    if user and user.roles == "recruiter":
+        if email_id:
+            if user.email != email_id:
+                return False, "Email does not match"
+        if mobile:
+            if user.mobile != mobile:
+                return False, "Mobile does not match"
+        return True, ""
+    return False, "Unauthorized Access"
+
 # -----------------------------------------------RECRUITER POST LOGIN ROUTES-------------------------------------------------
 # update profile
 @router.post("/updateProfile", response_model=api_models.Success_Message_Response)
 async def update_profile(decoded_token: (str,str) = Depends(token_listener),
                          recruiter_profile: api_models.Recruiter_Profile = Body(...)):
-    validated, msg = await validate_user(decoded_token[1],recruiter_profile.email,recruiter_profile.phone_number)
+    validated, msg = await validate_user_without_verification(decoded_token[1],recruiter_profile.email,recruiter_profile.phone_number)
     if not validated:
         raise HTTPException(status_code=403, detail=msg)
 

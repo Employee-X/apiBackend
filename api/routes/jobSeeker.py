@@ -37,9 +37,24 @@ async def validate_user(user_id: str, email_id: Optional[str], mobile: Optional[
         return True, ""
     return False, "Unauthorized Access"
 
-async def validate_user_before_verify(email_id: Optional[str], mobile: Optional[str]):
-    user = await user_db.get_user_by_email(email_id)
-    # user = await user_db.get_user_by_id(user_id)
+# async def validate_user_before_verify(email_id: Optional[str], mobile: Optional[str]):
+#     user = await user_db.get_user_by_email(email_id)
+#     # user = await user_db.get_user_by_id(user_id)
+#     if user and user.roles == "job_seeker":
+#         if email_id:
+#             if user.email != email_id:
+#                 return False, "Email does not match"
+#         if mobile:
+#             if user.mobile != mobile:
+#                 return False, "Mobile does not match"
+#         return True, ""
+#     return False, "Unauthorized Access"
+
+async def validate_user_without_verification(user_id: str,
+                                        email_id: Optional[str],
+                                        mobile: Optional[str]):
+    user = await user_db.get_user_by_id(user_id)
+    # raise HTTPException(status_code=404,detail=str(user))
     if user and user.roles == "job_seeker":
         if email_id:
             if user.email != email_id:
@@ -54,7 +69,7 @@ async def validate_user_before_verify(email_id: Optional[str], mobile: Optional[
 # update profile
 @router.post("/updateProfile", response_model=api_models.Success_Message_Response)
 async def update_profile(decoded_token: (str,str) = Depends(token_listener),job_seeker_profile: api_models.Job_Seeker_Profile = Body(...)):
-    validated, msg = await validate_user(decoded_token[1],job_seeker_profile.email,job_seeker_profile.phone_number)
+    validated, msg = await validate_user_without_verification(decoded_token[1],job_seeker_profile.email,job_seeker_profile.phone_number)
     if not validated:
         raise HTTPException(status_code=403, detail=msg)
 

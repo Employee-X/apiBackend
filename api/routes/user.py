@@ -55,7 +55,7 @@ async def user_login(user_credentials: api_models.User_SignIn = Body(...)):
     raise HTTPException(status_code=403, detail = "Incorrect email or password")
 
 
-@router.post("/signup",response_model=api_models.Success_Message_Response)
+@router.post("/signup",response_model=api_models.User_SignIn_Response)
 async def user_signup(user: api_models.User_SignUp = Body(...)):
     if user.password != user.confirm_password:
         raise HTTPException(status_code=403, detail="Passwords entered do not match")
@@ -103,18 +103,18 @@ async def user_signup(user: api_models.User_SignUp = Body(...)):
     else:
         raise HTTPException(status_code=403, detail="Invalid user roles")
     # return user created successfully
-    return api_models.Success_Message_Response(
-        message="Account created successfully"
-    )
-    # user_exists = await user_db.get_user_by_email(user.email)
-    # token = sign_jwt(str(user_exists.id))
-    # _ = await admin_db.incr_signup()
-    # return api_models.User_SignIn_Response(
-    #     access_token = token,
-    #     roles = user_exists.roles,
-    #     email_verified=user_exists.email_verified,
-    #     mobile_verified=user_exists.mobile_verified
+    # return api_models.Success_Message_Response(
+    #     message="Account created successfully"
     # )
+    user_exists = await user_db.get_user_by_email(user.email)
+    token = sign_jwt(str(user_exists.id))
+    _ = await admin_db.incr_signup()
+    return api_models.User_SignIn_Response(
+        access_token = token,
+        roles = user_exists.roles,
+        email_verified=user_exists.email_verified,
+        mobile_verified=user_exists.mobile_verified
+    )
 
 @router.post("/sendEmail",response_model=api_models.Success_Message_Response)
 def sendEmail(reciever_email: str,message: str):
