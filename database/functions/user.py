@@ -38,7 +38,7 @@ async def get_user_by_mobile(mobile: str) -> Union[dict, None]:
     return None
 
 async def update_otp(user_id: str, otp: int) -> Union[DbUserModels.User, None]:
-    expiration_time = datetime.datetime.now() + datetime.timedelta(minutes=3)
+    expiration_time = datetime.datetime.now() + datetime.timedelta(minutes=0.5)
     time_in_str = expiration_time.isoformat()
     update_query = {"$set": {
         "otp": otp,
