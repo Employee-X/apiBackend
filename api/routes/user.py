@@ -130,7 +130,7 @@ async def generate_otp(email_input: api_models.SendOtp = Body(...)):
         raise HTTPException(status_code=403, detail=msg)
     user = await user_db.get_user_by_email(email=email_input.email)
     current_time = datetime.datetime.now()
-    expiration_tim_str = user.otp_expiration
+    expiration_tim_str = user.otp_resend
     if expiration_tim_str:
         expiration_time = datetime.datetime.fromisoformat(expiration_tim_str)
         # if otp already exists and is not expired

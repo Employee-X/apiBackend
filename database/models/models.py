@@ -17,6 +17,7 @@ class User(Document):
     mobile_verified: bool = False
     otp: Optional[int] = 000000
     otp_expiration: Optional[str] = "2023-04-01T05:00:30.001000"
+    otp_resend: Optional[str] = "2023-04-01T05:00:30.001000"
     referral: Optional[str] = None
 
     class Config:
@@ -30,6 +31,7 @@ class User(Document):
                 "mobile_verified": False,
                 "otp": 000000,
                 "expiration": "2021-05-05 12:00:00",
+                "otp_resend": "2021-05-05 12:00:00",
                 "referral": "fdjfkjflfj"
             }
         }
