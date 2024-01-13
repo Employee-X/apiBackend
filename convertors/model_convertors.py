@@ -202,6 +202,19 @@ def dbJobToApiJobWithStatus(job: DbUserModels.Job, status: Applicant_Status) -> 
         no_of_openings=job.no_of_openings,
     )
 
+def dbJobToApiPosterJob(job: DbUserModels.Job) -> apiModels.Job_as_Poster:
+    return apiModels.Job_as_Poster(
+        id=str(job.id),
+        title= job.title,
+        location= job.location,
+        job_type= job.job_type,
+        salary= job.salary,
+        company_name= job.company_name,
+        logo = job.logo,
+        category = job.category,
+        no_of_openings=job.no_of_openings,
+    )
+
 def dbRecruiterToApiAdmin(recruiter: DbUserModels.Recruiter) -> apiModels.Recruiter_with_approval_status:
     return apiModels.Recruiter_with_approval_status(
         id=str(recruiter.userId),

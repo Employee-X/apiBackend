@@ -1,7 +1,7 @@
 import datetime
 from typing import Union
 from beanie import PydanticObjectId
-
+from pydantic_extra_types.phone_numbers import PhoneNumber
 import database.models.models as DbUserModels
 
 user_collection = DbUserModels.User
@@ -31,7 +31,7 @@ async def get_user_by_email(email: str) -> Union[dict, None]:
         return user
     return None
 
-async def get_user_by_mobile(mobile: str) -> Union[dict, None]:
+async def get_user_by_mobile(mobile: PhoneNumber) -> Union[dict, None]:
     user = await user_collection.find_one({"mobile": mobile})
     if user:
         return user

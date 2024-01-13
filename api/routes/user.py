@@ -9,27 +9,23 @@ import database.functions.jobSeeker as job_seeker_db
 import database.functions.recruiter as recruiter_db
 import database.functions.college as college_db
 import database.functions.admin as admin_db
+import database.functions.job as job_db
 from auth.otp import otp_generator,send_otp_phone
 import convertors.model_convertors as convertors
 import api.models.models as api_models
 import database.models.models as db_models
 from business.policy import VERIFIED_RECRUITER_COINS
+from pydantic_extra_types.phone_numbers import PhoneNumber
 
 router = APIRouter()
 
 hash_helper = CryptContext(schemes=["bcrypt"])
 
 
-async def validate_user_before_verify(email_id: Optional[str], mobile: Optional[str]):
-    user = await user_db.get_user_by_email(email_id)
+async def validate_user_before_verify(mobile: Optional[PhoneNumber]):
+    user = await user_db.get_user_by_mobile(mobile)
     # user = await user_db.get_user_by_id(user_id)
     if user:
-        if email_id:
-            if user.email != email_id:
-                return False, "Email does not match"
-        if mobile:
-            if user.mobile != mobile:
-                return False, "Mobile does not match"
         return True, ""
     return False, "Unauthorized Access"
 
@@ -124,11 +120,11 @@ def sendEmail(reciever_email: str,message: str):
     )
 
 @router.post("/generateOtp", response_model=api_models.Success_Message_Response)
-async def generate_otp(email_input: api_models.SendOtp = Body(...)):
-    validated, msg = await validate_user_before_verify(email_id=email_input.email,mobile=email_input.phone_number)
+async def generate_otp(otp_input: api_models.SendOtp = Body(...)):
+    validated, msg = await validate_user_before_verify(mobile=otp_input.phone_number)
     if not validated:
         raise HTTPException(status_code=403, detail=msg)
-    user = await user_db.get_user_by_email(email=email_input.email)
+    user = await user_db.get_user_by_mobile(mobile=otp_input.phone_number)
     current_time = datetime.datetime.now()
     expiration_tim_str = user.otp_resend
     if expiration_tim_str:
@@ -139,7 +135,7 @@ async def generate_otp(email_input: api_models.SendOtp = Body(...)):
             time_instring = int(time_remaining.total_seconds())
             raise HTTPException(status_code=403, detail=f"OTP already sent and is not expired. Try again in {time_instring} seconds")
     otp = otp_generator()
-    _ = send_otp_phone(otp,email_input.phone_number)
+    _ = send_otp_phone(otp,otp_input.phone_number)
     res = await user_db.update_otp(user.id,otp)
     return api_models.Success_Message_Response(
         message = "OTP sent successfully"
@@ -147,10 +143,10 @@ async def generate_otp(email_input: api_models.SendOtp = Body(...)):
 
 @router.post("/verifyOtp", response_model=api_models.User_SignIn_Response)
 async def verify_otp(otp_input: api_models.RecvOtp = Body(...)):
-    validated, msg = await validate_user_before_verify(email_id=otp_input.email,mobile=otp_input.phone_number)
+    validated, msg = await validate_user_before_verify(mobile=otp_input.phone_number)
     if not validated:
         raise HTTPException(status_code=403, detail=msg)
-    user = await user_db.get_user_by_email(email=otp_input.email)
+    user = await user_db.get_user_by_mobile(mobile=otp_input.phone_number)
     current_time = datetime.datetime.now()
     expiration_tim_str = user.otp_expiration
     if expiration_tim_str:
@@ -168,3 +164,26 @@ async def verify_otp(otp_input: api_models.RecvOtp = Body(...)):
                 mobile_verified=user.mobile_verified,
                 )
     raise HTTPException(status_code=403, detail="OTP is invalid or expired")
+
+
+# get all jobs
+@router.get("/getAllJobs", response_model=api_models.Job_as_Poster_List)
+async def get_jobs():
+    jobs = await job_db.get_all_jobs()
+    apiJobs = []
+    for job in jobs:
+        if job.job_approval_status == "hold":
+            continue
+        apiJobs.append(convertors.dbJobToApiPosterJob(job))
+    return api_models.Job_as_Poster_List(
+        jobs = apiJobs
+    )
+
+# get job by id
+@router.get("/getJob/{jobId}", response_model=api_models.Job_with_id)
+async def get_job(jobId):
+    job = await job_db.get_job_by_id(jobId)
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    apiJob = convertors.dbJobToApiJobWithId(job)
+    return apiJob

@@ -36,26 +36,22 @@ class User_SignIn(HTTPBasicCredentials):
         }
 
 class SendOtp(BaseModel):
-    email: EmailStr
     phone_number: PhoneNumber
 
     class Config:
         json_schema_extra = {
             "example": {
-                "email": "abc123@gmail.com",
                 "phone_number": "+919988775566",
             }
         }
 
 class RecvOtp(BaseModel):
-    email: EmailStr
     phone_number: PhoneNumber
     otp: Optional[int] = None
 
     class Config:
         json_schema_extra = {
             "example": {
-                "email": "abc123@gmail.com",
                 "phone_number": "+919988775566",
                 "otp": 123456,
             }
@@ -494,7 +490,64 @@ class Job_with_status(Job_with_id):
             }
         }
 
+class Job_as_Poster(BaseModel):
+    id: str
+    title: Optional[str] = None
+    company_name: Optional[str] = None
+    logo: Optional[str] = None
+    location: Optional[str] = None
+    job_type: Optional[str] = None
+    salary: Optional[Dict[str,str]] = None
+    category: Optional[str] = None
+    no_of_openings: Optional[int] = None
 
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "id": "1234567890",
+                "title": "Software Engineer",
+                "company_name": "employeeX",
+                "logo":"https://aws.s3.com/abc123.pdf",
+                "location": "Delhi",
+                "job_type": "Full Time",
+                "salary": {"min":"10","max":"15","currency":"inr","type":"lpa"},
+                "category": "IT",
+                "no_of_openings": "2",
+            }
+        }
+
+class Job_as_Poster_List(BaseModel):
+    jobs : List[Job_as_Poster]
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "jobs": [
+                    {
+                        "id": "1234567890",
+                        "title": "Software Engineer",
+                        "company_name": "employeeX",
+                        "logo":"https://aws.s3.com/abc123.pdf",
+                        "location": "Delhi",
+                        "job_type": "Full Time",
+                        "salary": {"min":"10","max":"15","currency":"inr","type":"lpa"},
+                        "category": "IT",
+                        "no_of_openings": "2",
+                    },
+                    {
+                        "id": "1234567890",
+                        "title": "Software Engineer",
+                        "company_name": "employeeX",
+                        "logo":"https://aws.s3.com/abc123.pdf",
+                        "location": "Delhi",
+                        "job_type": "Full Time",
+                        "salary": {"min":"10","max":"15","currency":"inr","type":"lpa"},
+                        "category": "IT",
+                        "no_of_openings": "2",
+                    }
+                ]
+            }
+        }
 
 class Job_List(BaseModel):
     jobs: List[Job_with_id]
@@ -749,4 +802,5 @@ class admin_log(BaseModel):
                 "inactive_jobs": 0
             }
         }
+
 
