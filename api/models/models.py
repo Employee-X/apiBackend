@@ -500,6 +500,7 @@ class Job_as_Poster(BaseModel):
     salary: Optional[Dict[str,str]] = None
     category: Optional[str] = None
     no_of_openings: Optional[int] = None
+    no_of_applicants: Optional[int] = None
 
     class Config:
         json_schema_extra = {
@@ -513,6 +514,7 @@ class Job_as_Poster(BaseModel):
                 "salary": {"min":"10","max":"15","currency":"inr","type":"lpa"},
                 "category": "IT",
                 "no_of_openings": "2",
+                "no_of_applicants": "5",
             }
         }
 
@@ -533,6 +535,7 @@ class Job_as_Poster_List(BaseModel):
                         "salary": {"min":"10","max":"15","currency":"inr","type":"lpa"},
                         "category": "IT",
                         "no_of_openings": "2",
+                        "no_of_applicants": "5",
                     },
                     {
                         "id": "1234567890",
@@ -544,6 +547,7 @@ class Job_as_Poster_List(BaseModel):
                         "salary": {"min":"10","max":"15","currency":"inr","type":"lpa"},
                         "category": "IT",
                         "no_of_openings": "2",
+                        "no_of_applicants": "5",
                     }
                 ]
             }

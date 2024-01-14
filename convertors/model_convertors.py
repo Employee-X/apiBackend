@@ -213,6 +213,7 @@ def dbJobToApiPosterJob(job: DbUserModels.Job) -> apiModels.Job_as_Poster:
         logo = job.logo,
         category = job.category,
         no_of_openings=job.no_of_openings,
+        no_of_applicants=job.no_of_applicants,
     )
 
 def dbRecruiterToApiAdmin(recruiter: DbUserModels.Recruiter) -> apiModels.Recruiter_with_approval_status:
