@@ -83,9 +83,10 @@ def apiRecruiterProfileToDbRecruiterProfile(profile: apiModels.Recruiter_Profile
         address= profile.address,
         phone_number= profile.phone_number,
         linkedin= profile.linkedin,
-        descripion=profile.description,
+        description=profile.description,
         coins=encrypt(str(VERIFIED_RECRUITER_COINS)),
         earning_by_referral=encrypt(str(0)),
+        date_of_signup=str(datetime.now(timezone(timedelta(hours=+5.5),'IST')).date().strftime("%d-%m-%Y")),
     )
 
 def apiCollegeProfileToDbCollegeProfile(profile: apiModels.College_Profile, userId: PydanticObjectId) -> DbUserModels.College:
@@ -156,6 +157,7 @@ def apiJobToDbJob(job: apiModels.Job, recruiterId: PydanticObjectId,logo_url: st
         status= job.status,
         no_of_applicants = 0,
         category =job.category,
+        date_posted=str(datetime.now(timezone(timedelta(hours=+5.5),'IST')).date().strftime("%d-%m-%Y")),
         coins=encrypt(str(COINS_ON_NEW_JOB)),
         job_approval_status=job_approval_status,
         no_of_openings=job.no_of_openings,

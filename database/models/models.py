@@ -136,7 +136,7 @@ class Recruiter(Document):
     coins: Optional[str] = None
     free_jobs: Optional[int] = NUMBER_OF_FREE_JOBS
     approval_status: Optional[Recruiter_Status] = "awaiting"
-    date_of_signup: Optional[str] = str(datetime.now(timezone(timedelta(hours=+5.5),'IST')).date().strftime("%d-%m-%Y"))
+    date_of_signup: Optional[str] = None
     referral_id: Optional[str] = None
     transactions: List[tuple] = []
     earning_by_referral: Optional[str] = None
@@ -182,7 +182,7 @@ class Job(Document):
     status: Optional[Job_Status] = "active"
     applicants: Optional[Dict[PydanticObjectId,bool]] = {}
     no_of_applicants: Optional[int] = 0
-    date_posted: Optional[str] = str(datetime.now(timezone(timedelta(hours=+5.5),'IST')).date().strftime("%d-%m-%Y"))
+    date_posted: Optional[str] = None
     category: Optional[str] = None
     coins: Optional[str] = None
     job_approval_status: Optional[Job_Approval_Status] = "unhold"
