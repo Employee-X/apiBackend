@@ -45,28 +45,18 @@ async def user_login(user_credentials: api_models.User_SignIn = Body(...)):
                 email_verified=user_exists.email_verified,
                 mobile_verified=user_exists.mobile_verified,
             )
-
         raise HTTPException(status_code=403, detail = "Incorrect email or password")
-    
     raise HTTPException(status_code=403, detail = "Incorrect email or password")
 
 
-@router.post("/signup",response_model=api_models.User_SignIn_Response)
+@router.post("/signup",response_model=api_models.Success_Message_Response)
 async def user_signup(user: api_models.User_SignUp = Body(...)):
-    if user.password != user.confirm_password:
-        raise HTTPException(status_code=403, detail="Passwords entered do not match")
-    user_exists = await user_db.get_user_by_email(user.email)
-    if user_exists:
-        raise HTTPException(
-            status_code=409, detail = "User with email supplied already exists"
-        )
     user_exists = await user_db.get_user_by_mobile(user.phone_number)
     if user_exists:
         raise HTTPException(
             status_code=409, detail = "User with mobile supplied already exists"
         )
     
-    user.password = hash_helper.encrypt(user.password)
     if user.roles == "recruiter":
         referral = user.referral
         if referral:
@@ -77,39 +67,56 @@ async def user_signup(user: api_models.User_SignUp = Body(...)):
     
            
     if dbUser.roles == "job_seeker":
-        new_profile = api_models.Job_Seeker_Profile(email = dbUser.email, phone_number = user.phone_number)
+        new_profile = api_models.Job_Seeker_Profile(phone_number = user.phone_number)
         new_user = await user_db.add_user(dbUser)
         db_profile = convertors.apiJobSeekerProfileToDbJobSeekerProfile(new_profile, new_user.id)
         new_profile = await job_seeker_db.add_job_seeker(db_profile)
     elif dbUser.roles == "recruiter":
-        new_profile = api_models.Recruiter_Profile(email = dbUser.email, phone_number = user.phone_number)
+        new_profile = api_models.Recruiter_Profile(phone_number = user.phone_number)
         new_user = await user_db.add_user(dbUser)
         db_profile = convertors.apiRecruiterProfileToDbRecruiterProfile(new_profile, new_user.id)
         new_profile = await recruiter_db.add_recruiter(db_profile)
         _ = await recruiter_db.add_mssg(db_profile.userId,VERIFIED_RECRUITER_COINS,"signup_bonus")
-    elif dbUser.roles == "college":
-        new_profile = api_models.College_Profile(email = dbUser.email, phone_number = user.phone_number)
-        new_user = await user_db.add_user(dbUser)
-        db_profile = convertors.apiCollegeProfileToDbCollegeProfile(new_profile, new_user.id)
-        new_profile = await college_db.add_college(db_profile)
-    elif dbUser.roles == "admin":
-        new_user = await user_db.add_user(dbUser)
-        db_profile = db_models.Admin(adminId=new_user.id)
-        new_profile = await admin_db.add_admin(db_profile)
+    # elif dbUser.roles == "admin":
+    #     new_user = await user_db.add_user(dbUser)
+    #     db_profile = db_models.Admin(adminId=new_user.id)
+    #     new_profile = await admin_db.add_admin(db_profile)
     else:
         raise HTTPException(status_code=403, detail="Invalid user roles")
-    # return user created successfully
-    # return api_models.Success_Message_Response(
-    #     message="Account created successfully"
-    # )
-    user_exists = await user_db.get_user_by_email(user.email)
+    return api_models.Success_Message_Response(
+        message="Account created successfully"
+    )
+
+@router.post("/updateUser",response_model=api_models.User_SignIn_Response)
+async def updateUser(phone_number: PhoneNumber,updates: api_models.User_Update = Body(...)):
+    user_exists = await user_db.get_user_by_mobile(phone_number)
+    if not user_exists:
+        raise HTTPException(
+            status_code=404, detail = "Invalid User"
+        )
+    if not user_exists.mobile_verified:
+        raise HTTPException(
+            status_code = 404, detail = "Mobile not verified"
+        )
+    user_by_email = await user_db.get_user_by_email(updates.email)
+    # raise HTTPException(status_code=404,detail=str(user_by_email))
+    if user_by_email:
+        raise HTTPException(
+            status_code=404,detail="User with email supplied already exists"
+        )
+    user_password = hash_helper.encrypt(updates.password)
+    updated_user = await user_db.update_user(user_exists.id,updates.email,user_password)
+    if user_exists.roles == "job_seeker":
+        _ =  await job_seeker_db.update_email(updates.email,phone_number)
+    elif user_exists.roles == "recruiter":
+        _ =  await recruiter_db.update_email(updates.email,phone_number)
     token = sign_jwt(str(user_exists.id))
     _ = await admin_db.incr_signup()
     return api_models.User_SignIn_Response(
         access_token = token,
-        roles = user_exists.roles,
-        email_verified=user_exists.email_verified,
-        mobile_verified=user_exists.mobile_verified
+        roles = updated_user.roles,
+        email_verified=updated_user.email_verified,
+        mobile_verified=updated_user.mobile_verified
     )
 
 @router.post("/sendEmail",response_model=api_models.Success_Message_Response)
@@ -152,9 +159,7 @@ async def verify_otp(otp_input: api_models.RecvOtp = Body(...)):
     if expiration_tim_str:
         expiration_time = datetime.datetime.fromisoformat(expiration_tim_str)
         if user.otp and user.otp_expiration and current_time < expiration_time and user.otp == otp_input.otp:
-            user = await user_db.update_email_verified(user.id)    
-            # user_exists = await user_db.get_user_by_email(otp_input.email)
-            # if user_exists:
+            user = await user_db.update_phone_verified(user.id)    
             token = sign_jwt(str(user.id))
             _ = await admin_db.incr_login()
             return api_models.User_SignIn_Response(

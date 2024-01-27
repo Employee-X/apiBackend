@@ -37,18 +37,6 @@ async def validate_user(user_id: str, email_id: Optional[str], mobile: Optional[
         return True, ""
     return False, "Unauthorized Access"
 
-# async def validate_user_before_verify(email_id: Optional[str], mobile: Optional[str]):
-#     user = await user_db.get_user_by_email(email_id)
-#     # user = await user_db.get_user_by_id(user_id)
-#     if user and user.roles == "job_seeker":
-#         if email_id:
-#             if user.email != email_id:
-#                 return False, "Email does not match"
-#         if mobile:
-#             if user.mobile != mobile:
-#                 return False, "Mobile does not match"
-#         return True, ""
-#     return False, "Unauthorized Access"
 
 async def validate_user_without_verification(user_id: str,
                                         email_id: Optional[str],
@@ -65,8 +53,10 @@ async def validate_user_without_verification(user_id: str,
         return True, ""
     return False, "Unauthorized Access"
 
+
 # -----------------------------------------JOB SEEKER POST LOGIN ROUTES-------------------------------------------------
 # update profile
+
 @router.post("/updateProfile", response_model=api_models.Success_Message_Response)
 async def update_profile(decoded_token: (str,str) = Depends(token_listener),job_seeker_profile: api_models.Job_Seeker_Profile = Body(...)):
     validated, msg = await validate_user_without_verification(decoded_token[1],job_seeker_profile.email,job_seeker_profile.phone_number)
@@ -279,55 +269,6 @@ async def get_applied_jobs(decoded_token: (str,str) = Depends(token_listener)):
     return api_models.Seeker_Job_List(
         jobs = apiJobs
     )
-
-# generate otp and send over email
-# @router.post("/generateOtp", response_model=api_models.Success_Message_Response)
-# async def generate_otp(email_input: api_models.SendOtp = Body(...)):
-#     validated, msg = await validate_user_before_verify(email_id=email_input.email,mobile=email_input.phone_number)
-#     if not validated:
-#         raise HTTPException(status_code=403, detail=msg)
-#     user = await user_db.get_user_by_email(email=email_input.email)
-#     current_time = datetime.datetime.now()
-#     expiration_tim_str = user.otp_expiration
-#     if expiration_tim_str:
-#         expiration_time = datetime.datetime.fromisoformat(expiration_tim_str)
-#         # if otp already exists and is not expired
-#         if user.otp and user.otp_expiration and current_time < expiration_time:
-#             time_remaining = expiration_time - current_time
-#             time_instring = int(time_remaining.total_seconds())
-#             raise HTTPException(status_code=403, detail=f"OTP already sent and is not expired. Try again in {time_instring} seconds")
-#     otp = otp_generator()
-#     _ = send_otp_phone(otp,email_input.phone_number)
-#     res = await user_db.update_otp(user.id,otp)
-#     return api_models.Success_Message_Response(
-#         message = "OTP sent successfully"
-#     )
-
-# verify otp
-# @router.post("/verifyOtp", response_model=api_models.User_SignIn_Response)
-# async def verify_otp(otp_input: api_models.RecvOtp = Body(...)):
-#     validated, msg = await validate_user_before_verify(email_id=otp_input.email,mobile=otp_input.phone_number)
-#     if not validated:
-#         raise HTTPException(status_code=403, detail=msg)
-#     user = await user_db.get_user_by_email(email=otp_input.email)
-#     current_time = datetime.datetime.now()
-#     expiration_tim_str = user.otp_expiration
-#     if expiration_tim_str:
-#         expiration_time = datetime.datetime.fromisoformat(expiration_tim_str)
-#         if user.otp and user.otp_expiration and current_time < expiration_time and user.otp == otp_input.otp:
-#             res = await user_db.update_email_verified(user.id)    
-#             # user_exists = await user_db.get_user_by_email(otp_input.email)
-#             # if user_exists:
-#             token = sign_jwt(str(user.id))
-#             _ = await admin_db.incr_login()
-#             return api_models.User_SignIn_Response(
-#                 access_token = token,
-#                 roles = user.roles,
-#                 email_verified=user.email_verified,
-#                 mobile_verified=user.mobile_verified,
-#                 )
-#     raise HTTPException(status_code=403, detail="OTP is invalid or expired")
-
 
 #update profile image
 @router.post("/updateIMG",response_model=api_models.Success_Message_Response)

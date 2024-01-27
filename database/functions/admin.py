@@ -32,21 +32,21 @@ async def check_time_limit() -> bool:
     now = int(datetime.now().strftime('%s'))
     query = {}
     if now>day_end_epoch:
-        updated_bound = (datetime.now()+timedelta(days=1)).strftime('%s')
+        updated_bound = (datetime.fromtimestamp(day_end_epoch)+timedelta(days=1)).strftime('%s')
         query["day_end_epoch"] = updated_bound
         query["last_day_logins"] = admin.day_logins
         query["last_day_new_users"] =  admin.day_new_users
         query["day_logins"] = 0
         query["day_new_users"] = 0
     if now>week_end_epoch:
-        updated_bound = (datetime.now()+timedelta(days=7)).strftime('%s')
+        updated_bound = (datetime.fromtimestamp(week_end_epoch)+timedelta(days=7)).strftime('%s')
         query["week_end_epoch"] = updated_bound
         query["last_week_logins"] = admin.week_logins
         query["last_week_new_users"] =  admin.week_new_users
         query["week_logins"] = 0
         query["week_new_users"] = 0
     if now>month_end_epoch:
-        updated_bound = (datetime.now()+timedelta(days=30)).strftime('%s')
+        updated_bound = (datetime.fromtimestamp(month_end_epoch)+timedelta(days=30)).strftime('%s')
         query["month_end_epoch"] = updated_bound
         query["last_month_logins"] = admin.month_logins
         query["last_month_new_users"] =  admin.month_new_users

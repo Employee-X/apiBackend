@@ -131,12 +131,8 @@ async def update_job(jobId,
     validated, msg = await validate_user(decoded_token[1], None, None)
     if not validated:
         raise HTTPException(status_code=403, detail=msg)
-    recruiter = await recruiter_db.get_recruiter_profile_by_userId(decoded_token[1])
-    company_name = recruiter.company_name
-    if job.company_name != company_name:
-        raise HTTPException(status_code=403, detail="Company name does not match")
-    dbJob = convertors.apiJobToDbJob(job, PydanticObjectId(decoded_token[1]),job.logo)
-    print(dbJob)
+    old_job = await job_db.get_job_by_id(jobId)
+    dbJob = convertors.apiJobToDbJob(job, PydanticObjectId(decoded_token[1]),job.logo,old_job.job_approval_status)
     _ = await job_db.update_job(dbJob,jobId)
 
     return api_models.Success_Message_Response(

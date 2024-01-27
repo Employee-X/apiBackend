@@ -9,9 +9,7 @@ from utils.utils import Applicant_Status,Job_Approval_Status
 
 def apiUserToDbUser(user: apiModels.User_SignUp) -> DbUserModels.User:
     return DbUserModels.User(
-        email = user.email,
         mobile= user.phone_number,
-        password = user.password,
         roles = user.roles,
     )
 

@@ -1,13 +1,12 @@
 from typing import Union
 from beanie import PydanticObjectId
 from fastapi import HTTPException
-
+from pydantic_extra_types.phone_numbers import PhoneNumber
 import database.models.models as DbUserModels
 
 job_seeker_collection = DbUserModels.Job_Seeker
 
 # --------------------------------------------------------------------------------------------------------
-
 
 async def add_job_seeker(new_profile: DbUserModels.Job_Seeker) -> DbUserModels.Job_Seeker:
     job_seeker = await new_profile.create()
@@ -22,6 +21,14 @@ async def update_profile(new_profile, userId: str) -> DbUserModels.Job_Seeker:
     updated_profile = await to_update_profile.update(update_query)
     return updated_profile
 
+async def update_email(email: str,mobile: PhoneNumber) -> DbUserModels.Job_Seeker:
+    update_query = {"$set":{
+        "email": email
+    }}
+    to_update_profile = await get_job_seeker_by_mobile(mobile)
+    # raise HTTPException(status_code=404,detail=str(to_update_profile))
+    updated_profile = await to_update_profile.update(update_query)
+    return updated_profile
 
 async def update_cv(cv_url,verification_url, userId) -> (DbUserModels.Job_Seeker, Union[str, None], Union[str, None]):
     update_query = {"$set": {
@@ -47,6 +54,13 @@ async def apply_job(jobId: str, userId: str):
 async def get_cv(userId) -> (Union[str, None], Union[str, None], bool):
     profile = await get_job_seeker_profile_by_userId(userId)
     return profile.cv_url, profile.verification_doc_url, profile.cv_verified_status,profile.cv_uploaded
+
+
+async def get_job_seeker_by_mobile(mobile: PhoneNumber) -> Union[dict, None]:
+    user = await job_seeker_collection.find_one({"phone_number": mobile})
+    if user:
+        return user
+    return None
 
 async def get_job_seeker_profile_by_userId(userId: str) -> Union[DbUserModels.Job_Seeker, None]:
     job_seeker = await job_seeker_collection.find_one({"userId": PydanticObjectId(userId)})

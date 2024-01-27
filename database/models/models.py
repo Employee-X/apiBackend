@@ -9,9 +9,9 @@ from datetime import date,timezone,datetime,timedelta
 
 
 class User(Document):
-    email: EmailStr
+    email: Optional[EmailStr] = None
     mobile: PhoneNumber
-    password: str
+    password: Optional[str] = None
     roles: Roles
     email_verified: bool = False
     mobile_verified: bool = False
@@ -43,7 +43,7 @@ class User(Document):
 class Job_Seeker(Document):
     userId: PydanticObjectId
 
-    email: EmailStr
+    email: Optional[EmailStr] = None
     phone_number: PhoneNumber
     fullname: Optional[str] = None
     college: Optional[str] = None
@@ -100,7 +100,7 @@ class College(Document):
     userId: PydanticObjectId
     your_name: Optional[str] = None
     college_name: Optional[str] = None
-    email: EmailStr
+    email: Optional[EmailStr] = None
     address: Optional[str] = None
     phone_number: PhoneNumber
     no_of_students: Optional[int] = None
@@ -126,7 +126,7 @@ class Recruiter(Document):
     userId: PydanticObjectId
     your_name: Optional[str] = None
     company_name: Optional[str] = None
-    email: EmailStr
+    email: Optional[EmailStr] = None
     address: Optional[str] = None
     phone_number: PhoneNumber
     linkedin: Optional[str] = None

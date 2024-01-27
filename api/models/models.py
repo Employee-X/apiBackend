@@ -7,22 +7,28 @@ from utils.utils import Roles,Gender,Profession,Applicant_Status,Recruiter_Statu
 
 # User Auth Models
 class User_SignUp(BaseModel):
-    email: EmailStr
     phone_number: PhoneNumber
-    password: str
-    confirm_password: str
     roles: Roles
     referral: Optional[str] = None
 
     class Config:
         json_schema_extra = {
             "example": {
-                "email": "abc123@gmail.com",
                 "phone_number": "+918888887777",
-                "password": "3xt3m#",
-                "confirm_password": "3xt3m#",
                 "roles": "job_seeker",
                 "referral": "dgfdhf",
+            }
+        }
+
+class User_Update(BaseModel):
+    email: EmailStr
+    password: str
+
+    class config:
+        json_schema_extra = {
+            "example": {
+                "email": "abc123@gmail.com",
+                "password": "3xx##",
             }
         }
 
@@ -73,11 +79,23 @@ class User_SignIn_Response(BaseModel):
             }
         }
 
+class Job_Seeker_Email_Update(BaseModel):
+    email: EmailStr
+    phone_number: PhoneNumber
+
+    class config:
+        josn_schema_extra = {
+            "example": {
+                "email": "abc@gmail.com",
+                "phone_number": "+917755668899",
+            }
+        }
+
 # Job Seeker Profile Model
 class Job_Seeker_Profile(BaseModel):
     fullname: Optional[str] = Field(default=None)
     college: Optional[str] = Field(default=None)
-    email: EmailStr
+    email: Optional[EmailStr] = Field(default=None)
     gender: Optional[Gender] = Field(default=None)
     phone_number: PhoneNumber
     date_of_birth: Optional[str] = Field(default=None)
@@ -283,7 +301,7 @@ class College_Profile(BaseModel):
 class Recruiter_Profile(BaseModel):
     your_name: Optional[str] = Field(default=None)
     company_name: Optional[str] = Field(default=None)
-    email: EmailStr
+    email: Optional[EmailStr] = Field(default=None)
     address: Optional[str] = Field(default=None)
     phone_number: PhoneNumber
     linkedin: Optional[str] = Field(default=None)

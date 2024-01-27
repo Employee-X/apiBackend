@@ -37,6 +37,16 @@ async def get_user_by_mobile(mobile: PhoneNumber) -> Union[dict, None]:
         return user
     return None
 
+async def update_user(user_id: str,email: str,password: str):
+    user = await get_user_by_id(user_id)
+    update_query = {"$set": {
+        "email": email,
+        "password": password,
+        "email_verified": True,
+    }}
+    updated_user = await user.update(update_query)
+    return updated_user
+
 async def update_otp(user_id: str, otp: int) -> Union[DbUserModels.User, None]:
     expiration_time = datetime.datetime.now() + datetime.timedelta(minutes=3)
     resend_time = datetime.datetime.now() + datetime.timedelta(minutes=0.5)
@@ -50,10 +60,17 @@ async def update_otp(user_id: str, otp: int) -> Union[DbUserModels.User, None]:
     updated_user = await user_to_update.update(update_query)
     return updated_user
 
+async def update_phone_verified(user_id: str) -> Union[DbUserModels.User, None]:
+    update_query = {"$set": {
+        "mobile_verified": True,
+    }}
+    user_to_update = await get_user_by_id(user_id)
+    updated_user = await user_to_update.update(update_query)
+    return updated_user
+
 async def update_email_verified(user_id: str) -> Union[DbUserModels.User, None]:
     update_query = {"$set": {
         "email_verified": True,
-        "mobile_verified": True,
     }}
     user_to_update = await get_user_by_id(user_id)
     updated_user = await user_to_update.update(update_query)

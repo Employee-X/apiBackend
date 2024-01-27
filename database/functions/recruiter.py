@@ -8,12 +8,22 @@ from fastapi import HTTPException
 recruiter_collection = DbUserModels.Recruiter
 from utils.utils import Transactions
 from datetime import date,timezone,datetime,timedelta
+from pydantic_extra_types.phone_numbers import PhoneNumber
+
 
 # --------------------------------------------------------------------------------------------------------
 
 async def add_recruiter(new_profile: DbUserModels.Recruiter) -> DbUserModels.Recruiter:
     company = await new_profile.create()
     return company
+
+async def update_email(email: str,mobile: PhoneNumber) -> DbUserModels.Job_Seeker:
+    update_query = {"$set":{
+        "email": email
+    }}
+    to_update_profile = await get_recruiter_by_mobile(mobile)
+    updated_profile = await to_update_profile.update(update_query)
+    return updated_profile
 
 async def update_profile(new_profile, userId) -> DbUserModels.Recruiter:
     req = {k: v for k, v in new_profile.dict().items() if v is not None}
@@ -28,6 +38,13 @@ async def get_recruiter_profile_by_userId(userId: str) -> Union[DbUserModels.Rec
     recruiter = await recruiter_collection.find_one({"userId": PydanticObjectId(userId)})
     if recruiter:
         return recruiter
+    return None
+
+
+async def get_recruiter_by_mobile(mobile: PhoneNumber) -> Union[dict, None]:
+    user = await recruiter_collection.find_one({"phone_number": mobile})
+    if user:
+        return user
     return None
 
 async def get_recruiter_by_email(email: str) -> Union[dict, None]:
@@ -101,7 +118,7 @@ async def add_mssg(userId,amount: int,type: Transactions,email: str = None):
     updated_profile = await to_update_profile.update(update_query)
     return updated_profile
 
-async def check_referral(referral,email: str = None) -> bool:
+async def check_referral(referral,phone_number: PhoneNumber = None) -> bool:
     recruiter = await recruiter_collection.find_one({"referral_id": referral})
     if not recruiter:
         return False
@@ -115,7 +132,7 @@ async def check_referral(referral,email: str = None) -> bool:
     updated_coins = encrypt(str(coins))
     _= await update_coin(recruiter.userId,updated_coins)
     _ = await update_ref_id(recruiter.userId)
-    _ = await add_mssg(recruiter.userId,REFERRAL_AMOUNT,"referral",email)
+    _ = await add_mssg(recruiter.userId,REFERRAL_AMOUNT,"referral",phone_number)
     return True
 
 async def get_transaction_history(userId):
